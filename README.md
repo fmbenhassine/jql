@@ -6,7 +6,7 @@ JCQL (Java Code Query Language) makes it possible to query Java source code in p
 * What is the longest class name?
 * Is there any class that has more than 20 methods?
 
-This kind of static analysis allows you to have precious insights in order to improve your code base.
+This kind of static analysis gives you precious insights in order to improve your code base.
 JCQL tools can be easily integrated in your build process to continuously check if your coding rules are respected.
 
 # How does it work
@@ -83,3 +83,9 @@ select NAME, LENGTH(NAME) as length from CLASS order by length desc limit 10
 ```sql
 select NAME, LENGTH(NAME) as length from METHOD order by length desc limit 10
 ```
+
+# Credits
+
+* JCQL tools use the great [java-parser](https://github.com/javaparser/javaparser) library to parse Java code and transform it a relational model.
+
+* JCQL tools use [Sqlite](https://www.sqlite.org) to store and query relational data about Java code
