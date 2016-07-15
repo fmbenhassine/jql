@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/benas/jcql.svg?branch=master)](https://travis-ci.org/benas/jcql)
-[![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)]
-[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)]
+![Build Status](https://travis-ci.org/benas/jcql.svg?branch=master)](https://travis-ci.org/benas/jcql)
+![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)
+![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)
 
 # About JCQL
 
