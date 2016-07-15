@@ -25,11 +25,9 @@ package io.github.benas.jcql.core;
 
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.*;
 import io.github.benas.jcql.Database;
+import io.github.benas.jcql.model.Field;
 import io.github.benas.jcql.model.Interface;
 import io.github.benas.jcql.model.Method;
 import io.github.benas.jcql.model.Class;
@@ -47,20 +45,21 @@ import static org.apache.commons.io.FileUtils.*;
 
 public class Indexer {
 
+    /*
+     * TODO: the following is still an early unfinished POC to clean up
+     */
     public void index(File sourceCodeDirectory, File databaseDirectory) throws IOException {
         System.out.println("Indexing source code in " + sourceCodeDirectory.getAbsolutePath() + " in database " + getDatabasePath(databaseDirectory));
         initDatabaseIn(databaseDirectory);
         Database database = new Database(databaseDirectory);
 
-        /*
-         * TODO: the following is still an early unfinished POC to clean up
-         */
         Collection<File> files = listFiles(sourceCodeDirectory, new String[]{"java"}, true);
         int totalFiles = files.size();
         int fileIndex = 1;
         int cuId = 0;
         int classId = 0;
         int interfaceId = 0;
+        int fieldId = 0;
         int methodId = 0;
         int parameterId = 0;
         for (File file : files) {
@@ -84,6 +83,14 @@ public class Indexer {
                     }
 
                     for (BodyDeclaration member : type.getMembers()) {
+                        if (member instanceof FieldDeclaration) {
+                            FieldDeclaration fieldDeclaration = (FieldDeclaration) member;
+                            fieldId++;
+                            int fieldModifiers = fieldDeclaration.getModifiers();
+                            String name = fieldDeclaration.getVariables().get(0).getId().getName(); // TODO add support for multiple fields, ex: private String firstName, lastName;
+                            database.save(new Field(fieldId, name, fieldDeclaration.getType().toString(),
+                                    isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), isInterface ? interfaceId : classId));
+                        }
                         if (member instanceof MethodDeclaration) {
                             MethodDeclaration methodDeclaration = (MethodDeclaration) member;
                             methodId++;

@@ -54,6 +54,12 @@ public class Database {
         jdbcTemplate.update("insert into INTERFACE values (?,?,?,?,?)", type.getId(), type.getName(), toSqliteBoolean(type.isFinal()), toSqliteBoolean(type.isPublic()), type.getCompilationUnitId());
     }
 
+    public void save(Field field) {
+        jdbcTemplate.update("insert into FIELD values (?,?,?,?,?,?,?,?)",
+                field.getId(), field.getName(), field.getType(),
+                toSqliteBoolean(field.isPublic()), toSqliteBoolean(field.isStatic()), toSqliteBoolean(field.isFinal()), toSqliteBoolean(field.isTransient()), field.getTypeId());
+    }
+
     public void save(Method method) {
         jdbcTemplate.update("insert into METHOD values (?,?,?,?,?,?)", method.getId(), method.getName(), toSqliteBoolean(method.isAbstract()), toSqliteBoolean(method.isFinal()), toSqliteBoolean(method.isPublic()), method.getTypeId());
     }
@@ -62,6 +68,7 @@ public class Database {
         jdbcTemplate.update("insert into PARAMETER values (?,?,?,?)", parameter.getId(), parameter.getName(), parameter.getType(), parameter.getMethodId());
     }
 
+    // SQLITE 3 does not support boolean ..
     private int toSqliteBoolean(boolean bool) {
         return bool ? 1 : 0;
     }
