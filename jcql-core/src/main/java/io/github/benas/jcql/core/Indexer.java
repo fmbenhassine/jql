@@ -28,6 +28,10 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import io.github.benas.jcql.Database;
+import io.github.benas.jcql.model.Interface;
+import io.github.benas.jcql.model.Method;
+import io.github.benas.jcql.model.Class;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -37,6 +41,7 @@ import java.util.List;
 
 import static com.github.javaparser.JavaParser.parse;
 import static io.github.benas.jcql.Utils.*;
+import static java.lang.reflect.Modifier.*;
 import static org.apache.commons.io.FileUtils.*;
 
 public class Indexer {
@@ -44,25 +49,44 @@ public class Indexer {
     public void index(File sourceCodeDirectory, File databaseDirectory) throws IOException {
         System.out.println("Indexing source code in " + sourceCodeDirectory.getAbsolutePath() + " in database " + getDatabasePath(databaseDirectory));
         initDatabaseIn(databaseDirectory);
+        Database database = new Database(databaseDirectory);
 
-        DataSource dataSource = getDataSourceFrom(databaseDirectory);
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-
+        /*
+         * TODO: the following is still an early unfinished POC to clean up
+         */
         Collection<File> files = listFiles(sourceCodeDirectory, new String[]{"java"}, true);
         int totalFiles = files.size();
         int fileIndex = 1;
-        int typeId = 0;
+        int cuId = 0;
+        int classId = 0;
+        int interfaceId = 0;
+        int methodId = 0;
         for (File file : files) {
             try {
                 CompilationUnit cu = parse(file);
+                cuId++;
+                io.github.benas.jcql.model.CompilationUnit compilationUnit = new io.github.benas.jcql.model.CompilationUnit(cuId, file.getName(), cu.getPackage().getPackageName());
+                database.save(compilationUnit);
                 List<TypeDeclaration> types = cu.getTypes();
                 for (TypeDeclaration type : types) {
-                    jdbcTemplate.update("insert into CLASS values (?,?)", typeId++, type.getName());
-                    int methodId = 0;
+                    int modifiers = type.getModifiers();
+                    boolean isInterface = isInterface(modifiers);
+                    if (isInterface) {
+                        interfaceId++;
+                        Interface interfaze = new Interface(interfaceId, type.getName(), isFinal(modifiers), isPublic(modifiers), cuId);
+                        database.save(interfaze);
+                    } else {
+                        classId++;
+                        Class clazz = new Class(classId, type.getName(), isAbstract(modifiers), isFinal(modifiers), isPublic(modifiers), cuId);
+                        database.save(clazz);
+                    }
+
                     for (BodyDeclaration member : type.getMembers()) {
                         if (member instanceof MethodDeclaration) {
-                            MethodDeclaration method = (MethodDeclaration) member;
-                            jdbcTemplate.update("insert into METHOD values (?,?)", methodId++, method.getName());
+                            MethodDeclaration methodDeclaration = (MethodDeclaration) member;
+                            methodId++;
+                            int methodModifiers = methodDeclaration.getModifiers();
+                            database.save(new Method(methodId, methodDeclaration.getName(), isAbstract(methodModifiers), isFinal(methodModifiers), isPublic(methodModifiers), isInterface ? interfaceId : classId));
                         }
                     }
                 }
