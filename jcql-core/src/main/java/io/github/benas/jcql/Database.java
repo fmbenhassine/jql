@@ -54,6 +54,10 @@ public class Database {
         jdbcTemplate.update("insert into INTERFACE values (?,?,?,?,?)", type.getId(), type.getName(), toSqliteBoolean(type.isFinal()), toSqliteBoolean(type.isPublic()), type.getCompilationUnitId());
     }
 
+    public void save(Annotation annotation) {
+        jdbcTemplate.update("insert into ANNOTATION values (?,?,?,?)", annotation.getId(), annotation.getName(), toSqliteBoolean(annotation.isPublic()), annotation.getCompilationUnitId());
+    }
+
     public void save(Field field) {
         jdbcTemplate.update("insert into FIELD values (?,?,?,?,?,?,?,?)",
                 field.getId(), field.getName(), field.getType(),
