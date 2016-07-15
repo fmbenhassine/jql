@@ -1,6 +1,6 @@
 # About JCQL
 
-JCQL (Java Code Query Language) makes it possible to query Java source code in SQL. This allows you to ask question like:
+JCQL (Java Code Query Language) makes it possible to query Java source code in plain SQL. This allows you to ask questions like:
 
 * Is there any class that has no unit tests?
 * What is the longest class name?
@@ -15,7 +15,9 @@ JCQL tools create a relational model from a given Java source code base. Once yo
 query it with standard SQL. The relational model has been designed to be intuitive, natural and easy to understand and query.
 Here is a quick overview of the core tables:
 
-# Indexing your code base
+// TODO
+
+# Index your code base
 
 JCQL tools provide two ways to create a relational database from a given code base:
 
@@ -66,4 +68,18 @@ Or by specifying the Sqlite database file
 
 ```
 java -jar /path/to/jcql-shell-{latest-version}.jar /path/to/jcql.db
+```
+
+#### Examples
+
+###### Find the top 10 longest class names:
+
+```sql
+select NAME, LENGTH(NAME) as length from CLASS order by length desc limit 10
+```
+
+###### Find the top 10 longest method names:
+
+```sql
+select NAME, LENGTH(NAME) as length from METHOD order by length desc limit 10
 ```
