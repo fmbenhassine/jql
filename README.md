@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/benas/jcql.svg?branch=master)](https://travis-ci.org/benas/jcql)
+[![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)]
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)]
+
 # About JCQL
 
 JCQL (Java Code Query Language) makes it possible to query Java source code in plain SQL. This allows you to ask questions like:
