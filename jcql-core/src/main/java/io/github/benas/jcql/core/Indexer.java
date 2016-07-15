@@ -56,9 +56,7 @@ public class Indexer {
         int totalFiles = files.size();
         int fileIndex = 1;
         int cuId = 0;
-        int classId = 0;
-        int interfaceId = 0;
-        int annotationId = 0;
+        int typeIdId = 0;
         int fieldId = 0;
         int methodId = 0;
         int parameterId = 0;
@@ -73,18 +71,16 @@ public class Indexer {
                     int modifiers = type.getModifiers();
                     boolean isInterface = isInterface(modifiers);
                     boolean isAnnotation = type instanceof AnnotationDeclaration;
+                    typeIdId++;
                     if (isInterface) {
-                        interfaceId++;
-                        Interface interfaze = new Interface(interfaceId, type.getName(), isFinal(modifiers), isPublic(modifiers), cuId);
+                        Interface interfaze = new Interface(typeIdId, type.getName(), isFinal(modifiers), isPublic(modifiers), cuId);
                         database.save(interfaze);
                     } else {
                         if (isAnnotation) {
-                            annotationId++;
-                            Annotation annotation = new Annotation(annotationId, type.getName(), false, isPublic(modifiers), cuId);
+                            Annotation annotation = new Annotation(typeIdId, type.getName(), false, isPublic(modifiers), cuId);
                             database.save(annotation);
                         } else {
-                            classId++;
-                            Class clazz = new Class(classId, type.getName(), isAbstract(modifiers), isFinal(modifiers), isPublic(modifiers), cuId);
+                            Class clazz = new Class(typeIdId, type.getName(), isAbstract(modifiers), isFinal(modifiers), isPublic(modifiers), cuId);
                             database.save(clazz);
                         }
                     }
@@ -96,13 +92,13 @@ public class Indexer {
                             int fieldModifiers = fieldDeclaration.getModifiers();
                             String name = fieldDeclaration.getVariables().get(0).getId().getName(); // TODO add support for multiple fields, ex: private String firstName, lastName;
                             database.save(new Field(fieldId, name, fieldDeclaration.getType().toString(),
-                                    isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), isAnnotation ? annotationId : isInterface ? interfaceId : classId));
+                                    isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeIdId));
                         }
                         if (member instanceof MethodDeclaration) {
                             MethodDeclaration methodDeclaration = (MethodDeclaration) member;
                             methodId++;
                             int methodModifiers = methodDeclaration.getModifiers();
-                            database.save(new Method(methodId, methodDeclaration.getName(), isAbstract(methodModifiers), isFinal(methodModifiers), isPublic(methodModifiers), isAnnotation ? annotationId : isInterface ? interfaceId : classId));
+                            database.save(new Method(methodId, methodDeclaration.getName(), isAbstract(methodModifiers), isFinal(methodModifiers), isPublic(methodModifiers), typeIdId));
                             List<Parameter> parameters = methodDeclaration.getParameters();
                             for (Parameter parameter : parameters) {
                                 parameterId++;
@@ -113,7 +109,7 @@ public class Indexer {
                         if (member instanceof AnnotationMemberDeclaration) {
                             AnnotationMemberDeclaration annotationMemberDeclaration = (AnnotationMemberDeclaration) member;
                             methodId++;
-                            database.save(new Method(methodId, annotationMemberDeclaration.getName(), false, false, true, annotationId));
+                            database.save(new Method(methodId, annotationMemberDeclaration.getName(), false, false, true, typeIdId));
                         }
                     }
                 }
