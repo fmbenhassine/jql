@@ -27,6 +27,7 @@ import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import io.github.benas.jcql.Database;
 import io.github.benas.jcql.model.Interface;
@@ -61,6 +62,7 @@ public class Indexer {
         int classId = 0;
         int interfaceId = 0;
         int methodId = 0;
+        int parameterId = 0;
         for (File file : files) {
             try {
                 CompilationUnit cu = parse(file);
@@ -87,6 +89,12 @@ public class Indexer {
                             methodId++;
                             int methodModifiers = methodDeclaration.getModifiers();
                             database.save(new Method(methodId, methodDeclaration.getName(), isAbstract(methodModifiers), isFinal(methodModifiers), isPublic(methodModifiers), isInterface ? interfaceId : classId));
+                            List<Parameter> parameters = methodDeclaration.getParameters();
+                            for (Parameter parameter : parameters) {
+                                parameterId++;
+                                io.github.benas.jcql.model.Parameter p = new io.github.benas.jcql.model.Parameter(parameterId, parameter.getId().getName(), parameter.getType().toString(), methodId);
+                                database.save(p);
+                            }
                         }
                     }
                 }

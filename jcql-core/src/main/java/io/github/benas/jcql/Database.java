@@ -23,9 +23,7 @@
  */
 package io.github.benas.jcql;
 
-import io.github.benas.jcql.model.CompilationUnit;
-import io.github.benas.jcql.model.Interface;
-import io.github.benas.jcql.model.Method;
+import io.github.benas.jcql.model.*;
 import io.github.benas.jcql.model.Class;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -58,6 +56,10 @@ public class Database {
 
     public void save(Method method) {
         jdbcTemplate.update("insert into METHOD values (?,?,?,?,?,?)", method.getId(), method.getName(), toSqliteBoolean(method.isAbstract()), toSqliteBoolean(method.isFinal()), toSqliteBoolean(method.isPublic()), method.getTypeId());
+    }
+
+    public void save(Parameter parameter) {
+        jdbcTemplate.update("insert into PARAMETER values (?,?,?,?)", parameter.getId(), parameter.getName(), parameter.getType(), parameter.getMethodId());
     }
 
     private int toSqliteBoolean(boolean bool) {
