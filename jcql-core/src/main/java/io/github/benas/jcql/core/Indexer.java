@@ -31,23 +31,17 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.*;
 import java.util.Collection;
 import java.util.List;
 
 import static com.github.javaparser.JavaParser.parse;
 import static io.github.benas.jcql.Utils.*;
-import static java.nio.charset.Charset.defaultCharset;
 import static org.apache.commons.io.FileUtils.*;
 
 public class Indexer {
 
-    public void index(File sourceCodeDirectory, File databaseDirectory) throws IOException, URISyntaxException {
+    public void index(File sourceCodeDirectory, File databaseDirectory) throws IOException {
         System.out.println("Indexing source code in " + sourceCodeDirectory.getAbsolutePath() + " in database " + getDatabasePath(databaseDirectory));
         initDatabaseIn(databaseDirectory);
 
@@ -81,7 +75,7 @@ public class Indexer {
         System.out.println();
     }
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws IOException {
         String sourceCodeDir = "";
         String databaseDir = "";
         if (args.length >= 1) {
@@ -99,15 +93,23 @@ public class Indexer {
     }
 
 
-    private static void initDatabaseIn(File directory) throws IOException, URISyntaxException {
+    private static void initDatabaseIn(File directory) throws IOException {
         File database = getFile(getDatabasePath(directory));
         deleteQuietly(database);
         touch(database);
         DataSource dataSource = getDataSourceFrom(directory);
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        File schema = new File(Indexer.class.getResource("/database.sql").toURI());
-        List<String> ddl = readLines(schema, defaultCharset());
-        ddl.forEach(jdbcTemplate::update);
+        applyDDL(jdbcTemplate);
+    }
+
+    private static void applyDDL(JdbcTemplate jdbcTemplate) throws IOException {
+        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream("database.sql");
+        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                jdbcTemplate.update(line);
+            }
+        }
     }
 
 }

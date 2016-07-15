@@ -31,7 +31,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 @Mojo(name = "index", aggregator = true)
 public class JcqlMojo extends AbstractMojo {
@@ -48,7 +47,7 @@ public class JcqlMojo extends AbstractMojo {
         try {
             indexer.index(sourceCodeDirectory, databaseDirectory);
             getLog().info("Done.");
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             throw new MojoExecutionException("Unable to index jcql database in " + sourceCodeDirectory, e);
         }
     }
