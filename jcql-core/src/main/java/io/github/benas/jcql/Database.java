@@ -58,6 +58,10 @@ public class Database {
         jdbcTemplate.update("insert into ANNOTATION values (?,?,?,?)", annotation.getId(), annotation.getName(), toSqliteBoolean(annotation.isPublic()), annotation.getCompilationUnitId());
     }
 
+    public void save(Enumeration enumeration) {
+        jdbcTemplate.update("insert into ENUMERATION values (?,?,?,?)", enumeration.getId(), enumeration.getName(), toSqliteBoolean(enumeration.isPublic()), enumeration.getCompilationUnitId());
+    }
+
     public void save(Field field) {
         jdbcTemplate.update("insert into FIELD values (?,?,?,?,?,?,?,?)",
                 field.getId(), field.getName(), field.getType(),

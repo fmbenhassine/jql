@@ -71,6 +71,7 @@ public class Indexer {
                     int modifiers = type.getModifiers();
                     boolean isInterface = isInterface(modifiers);
                     boolean isAnnotation = type instanceof AnnotationDeclaration;
+                    boolean isEnumeration = type instanceof EnumDeclaration;
                     typeIdId++;
                     if (isInterface) {
                         Interface interfaze = new Interface(typeIdId, type.getName(), isFinal(modifiers), isPublic(modifiers), cuId);
@@ -79,6 +80,9 @@ public class Indexer {
                         if (isAnnotation) {
                             Annotation annotation = new Annotation(typeIdId, type.getName(), false, isPublic(modifiers), cuId);
                             database.save(annotation);
+                        } else if (isEnumeration) {
+                            Enumeration enumeration = new Enumeration(typeIdId, type.getName(), isPublic(modifiers), cuId);
+                            database.save(enumeration);
                         } else {
                             Class clazz = new Class(typeIdId, type.getName(), isAbstract(modifiers), isFinal(modifiers), isPublic(modifiers), cuId);
                             database.save(clazz);
