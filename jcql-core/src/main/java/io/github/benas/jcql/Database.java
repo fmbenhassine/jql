@@ -68,6 +68,10 @@ public class Database {
                 toSqliteBoolean(field.isPublic()), toSqliteBoolean(field.isStatic()), toSqliteBoolean(field.isFinal()), toSqliteBoolean(field.isTransient()), field.getTypeId());
     }
 
+    public void save(Constructor constructor) {
+        jdbcTemplate.update("insert into CONSTRUCTOR values (?,?,?,?)", constructor.getId(), constructor.getName(), toSqliteBoolean(constructor.isPublic()), constructor.getTypeId());
+    }
+
     public void save(Method method) {
         jdbcTemplate.update("insert into METHOD values (?,?,?,?,?,?)", method.getId(), method.getName(), toSqliteBoolean(method.isAbstract()), toSqliteBoolean(method.isFinal()), toSqliteBoolean(method.isPublic()), method.getTypeId());
     }

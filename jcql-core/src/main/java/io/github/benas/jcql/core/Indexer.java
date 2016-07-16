@@ -98,6 +98,17 @@ public class Indexer {
                             database.save(new Field(fieldId, name, fieldDeclaration.getType().toString(),
                                     isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeIdId));
                         }
+                        if (member instanceof ConstructorDeclaration) {
+                            ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) member;
+                            methodId++;
+                            database.save(new Constructor(methodId, constructorDeclaration.getName(), isPublic(constructorDeclaration.getModifiers()), typeIdId));
+                            List<Parameter> parameters = constructorDeclaration.getParameters();
+                            for (Parameter parameter : parameters) {
+                                parameterId++;
+                                io.github.benas.jcql.model.Parameter p = new io.github.benas.jcql.model.Parameter(parameterId, parameter.getId().getName(), parameter.getType().toString(), methodId);
+                                database.save(p);
+                            }
+                        }
                         if (member instanceof MethodDeclaration) {
                             MethodDeclaration methodDeclaration = (MethodDeclaration) member;
                             methodId++;
