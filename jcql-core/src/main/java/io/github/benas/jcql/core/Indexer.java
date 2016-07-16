@@ -69,7 +69,7 @@ public class Indexer {
                 List<TypeDeclaration> types = cu.getTypes();
                 for (TypeDeclaration type : types) {
                     int modifiers = type.getModifiers();
-                    boolean isInterface = isInterface(modifiers);
+                    boolean isInterface = type instanceof ClassOrInterfaceDeclaration && ((ClassOrInterfaceDeclaration) type).isInterface();
                     boolean isAnnotation = type instanceof AnnotationDeclaration;
                     boolean isEnumeration = type instanceof EnumDeclaration;
                     typeIdId++;
