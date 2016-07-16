@@ -76,6 +76,10 @@ public class Database {
         jdbcTemplate.update("insert into PARAMETER values (?,?,?,?)", parameter.getId(), parameter.getName(), parameter.getType(), parameter.getMethodId());
     }
 
+    public int count(String table) {
+        return jdbcTemplate.queryForObject("select count(ID) from " + table, Integer.class);
+    }
+
     // SQLITE 3 does not support boolean ..
     private int toSqliteBoolean(boolean bool) {
         return bool ? 1 : 0;
