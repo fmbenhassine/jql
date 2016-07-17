@@ -65,7 +65,8 @@ public class Indexer {
             try {
                 CompilationUnit cu = parse(file);
                 cuId++;
-                io.github.benas.jcql.model.CompilationUnit compilationUnit = new io.github.benas.jcql.model.CompilationUnit(cuId, file.getName(), cu.getPackage().getPackageName());
+                String packageName = cu.getPackage() != null ? cu.getPackage().getPackageName() : "";
+                io.github.benas.jcql.model.CompilationUnit compilationUnit = new io.github.benas.jcql.model.CompilationUnit(cuId, file.getName(), packageName);
                 database.save(compilationUnit);
                 List<TypeDeclaration> types = cu.getTypes();
                 for (TypeDeclaration type : types) {
