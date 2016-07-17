@@ -28,7 +28,6 @@ import io.github.benas.jcql.model.Class;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
-
 import java.io.File;
 
 import static io.github.benas.jcql.Utils.getDataSourceFrom;
@@ -80,13 +79,41 @@ public class Database {
         jdbcTemplate.update("insert into PARAMETER values (?,?,?,?)", parameter.getId(), parameter.getName(), parameter.getType(), parameter.getMethodId());
     }
 
+    public void save(Implements anImplements) {
+        jdbcTemplate.update("insert into IMPLEMENTS values (?,?)", anImplements.getClassId(), anImplements.getInterfaceId());
+    }
+
+    public void save(Extends anExtends) {
+        jdbcTemplate.update("insert into EXTENDS values (?,?)", anExtends.getTypeId(), anExtends.getExtendedTypeId());
+    }
+
     public int count(String table) {
-        return jdbcTemplate.queryForObject("select count(ID) from " + table, Integer.class);
+        return jdbcTemplate.queryForObject("select count(*) from " + table, Integer.class);
+    }
+
+    public int getInterfaceId(String name, String packageName) {
+        return jdbcTemplate.queryForObject("select i.id from interface i, compilation_unit cu where i.cu_id = cu.id and i.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
+    }
+
+    public int getClassId(String name, String packageName) {
+        return jdbcTemplate.queryForObject("select c.id from class c, compilation_unit cu where c.cu_id = cu.id and c.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
+    }
+
+    public boolean existInterface(String name, String packageName) {
+        return jdbcTemplate.queryForObject("select count(i.id) from interface i, compilation_unit cu where i.cu_id = cu.id and i.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class) == 1;
+    }
+
+    public boolean existClass(String name, String packageName) {
+        return jdbcTemplate.queryForObject("select count(c.id) from class c, compilation_unit cu where c.cu_id = cu.id and c.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class) == 1;
     }
 
     // SQLITE 3 does not support boolean ..
     private int toSqliteBoolean(boolean bool) {
         return bool ? 1 : 0;
+    }
+
+    private boolean fromSqliteBoolean(int bool) {
+        return bool == 1;
     }
 
 }

@@ -27,14 +27,16 @@ public class IndexerTest {
 
         Database database = new Database(databaseDirectory);
 
-        assertThat(database.count("class")).isEqualTo(1);
-        assertThat((Integer) database.count("interface")).isEqualTo(1);
-        assertThat((Integer) database.count("annotation")).isEqualTo(1);
-        assertThat((Integer) database.count("enumeration")).isEqualTo(1);
-        assertThat((Integer) database.count("field")).isEqualTo(1);
-        assertThat((Integer) database.count("constructor")).isEqualTo(1);
-        assertThat((Integer) database.count("method")).isEqualTo(4);
-        assertThat((Integer) database.count("parameter")).isEqualTo(2);
-        assertThat((Integer) database.count("compilation_unit")).isEqualTo(5);
+        assertThat(database.count("class")).isEqualTo(2);
+        assertThat(database.count("interface")).isEqualTo(2);
+        assertThat(database.count("annotation")).isEqualTo(1);
+        assertThat(database.count("enumeration")).isEqualTo(1);
+        assertThat(database.count("field")).isEqualTo(2);
+        assertThat(database.count("constructor")).isEqualTo(1);
+        assertThat(database.count("method")).isEqualTo(6);
+        assertThat(database.count("parameter")).isEqualTo(2);
+        assertThat(database.count("implements")).isEqualTo(2);
+        assertThat(database.count("extends")).isEqualTo(1);
+        assertThat(database.count("compilation_unit")).isEqualTo(7);
     }
 }

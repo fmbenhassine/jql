@@ -27,6 +27,7 @@ import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import io.github.benas.jcql.Database;
 import io.github.benas.jcql.model.*;
 import io.github.benas.jcql.model.Class;
@@ -133,6 +134,64 @@ public class Indexer {
             }
             System.out.print("\rIndexing files: " + getPercent(fileIndex, totalFiles) + "% " + ("(" + fileIndex + "/" + totalFiles + ")"));
             fileIndex++;
+        }
+
+        // Inefficient 2 phases algorithm: to optimize in one phase if possible
+        System.out.println();
+        System.out.println("Indexing relations..");
+        for (File file : files) {
+            try {
+                CompilationUnit cu = parse(file);
+                List<TypeDeclaration> types = cu.getTypes();
+                for (TypeDeclaration type : types) {
+                    boolean isInterface = type instanceof ClassOrInterfaceDeclaration && ((ClassOrInterfaceDeclaration) type).isInterface();
+                    boolean isAnnotation = type instanceof AnnotationDeclaration;
+                    boolean isEnumeration = type instanceof EnumDeclaration;
+                    if (isInterface) {
+                        // check if this interface extends another interface and persist relation in EXTENDS table
+                        ClassOrInterfaceDeclaration interfaceDeclaration = (ClassOrInterfaceDeclaration) type;
+                        List<ClassOrInterfaceType> extendedInterfaces = interfaceDeclaration.getExtends();
+                        for (ClassOrInterfaceType extendedInterface : extendedInterfaces) {
+                            String extendedInterfaceName = extendedInterface.getName();
+                            String extendedInterfacePackageName = ((CompilationUnit) extendedInterface.getParentNode().getParentNode()).getPackage().getPackageName();
+                            if (database.existInterface(extendedInterfaceName, extendedInterfacePackageName)) { // JDK interfaces are not indexed
+                                int extendedInterfaceId = database.getInterfaceId(extendedInterfaceName, extendedInterfacePackageName);
+                                int interfaceId = database.getClassId(interfaceDeclaration.getName(), cu.getPackage().getPackageName());
+                                database.save(new Extends(interfaceId, extendedInterfaceId));
+                            }
+                        }
+                    } else {
+                        if (!isAnnotation && !isEnumeration) {
+                            ClassOrInterfaceDeclaration classDeclaration = (ClassOrInterfaceDeclaration) type;
+
+                            // check if this class implements an interface and persist relation in IMPLEMENTS table
+                            List<ClassOrInterfaceType> implementedInterfaces = classDeclaration.getImplements();
+                            for (ClassOrInterfaceType implementedInterface : implementedInterfaces) {
+                                String implementedInterfaceName = implementedInterface.getName();
+                                String implementedInterfacePackageName = ((CompilationUnit) implementedInterface.getParentNode().getParentNode()).getPackage().getPackageName();
+                                if (database.existInterface(implementedInterfaceName, implementedInterfacePackageName)) { // JDK interfaces are not indexed
+                                    int interfaceId = database.getInterfaceId(implementedInterfaceName, implementedInterfacePackageName);
+                                    int classId = database.getClassId(type.getName(), cu.getPackage().getPackageName());
+                                    database.save(new Implements(classId, interfaceId));
+                                }
+                            }
+                            // check if this class extends another class and persist relation in EXTENDS table
+                            List<ClassOrInterfaceType> extendedClasses = classDeclaration.getExtends(); // should contain at most one extended class, no multiple inheritance in java
+                            for (ClassOrInterfaceType extendedClass : extendedClasses) {
+                                String extendedClassName = extendedClass.getName();
+                                String extendedClassPackageName = ((CompilationUnit) extendedClass.getParentNode().getParentNode()).getPackage().getPackageName();
+                                if (database.existClass(extendedClassName, extendedClassPackageName)) { // JDK classes are not indexed
+                                    int extendedClassId = database.getClassId(extendedClassName, extendedClassPackageName);
+                                    int classId = database.getClassId(classDeclaration.getName(), cu.getPackage().getPackageName());
+                                    database.save(new Extends(classId, extendedClassId));
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (ParseException | IOException e) {
+                System.err.println("Error while parsing " + file.getAbsolutePath());
+            }
         }
         System.out.println();
     }

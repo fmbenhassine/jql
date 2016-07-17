@@ -1,9 +1,11 @@
 package io.github.benas.jcql.code;
 
 @Bar(important = true)
-public class Foo implements Named {
+public class Foo extends AbstractFoo implements Named, Gendered {
 
     private String name;
+
+    private Gender gender;
 
     public Foo(String name) {
         this.name = name;
@@ -16,5 +18,9 @@ public class Foo implements Named {
     @Override
     public String getName() {
         return name;
+    }
+
+    public Gender getGender() {
+        return gender;
     }
 }
