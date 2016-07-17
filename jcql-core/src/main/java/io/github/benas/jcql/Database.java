@@ -91,6 +91,10 @@ public class Database {
         return jdbcTemplate.queryForObject("select count(*) from " + table, Integer.class);
     }
 
+    public int countClass(String name, String packageName) {
+        return jdbcTemplate.queryForObject("select count(c.id) from class c, compilation_unit cu where c.cu_id = cu.id and c.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
+    }
+
     public int getInterfaceId(String name, String packageName) {
         return jdbcTemplate.queryForObject("select i.id from interface i, compilation_unit cu where i.cu_id = cu.id and i.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
     }
