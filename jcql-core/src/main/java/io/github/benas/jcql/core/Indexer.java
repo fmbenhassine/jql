@@ -157,7 +157,7 @@ public class Indexer {
                             String extendedInterfacePackageName = ((CompilationUnit) extendedInterface.getParentNode().getParentNode()).getPackage().getPackageName();
                             if (database.existInterface(extendedInterfaceName, extendedInterfacePackageName)) { // JDK interfaces are not indexed
                                 int extendedInterfaceId = database.getInterfaceId(extendedInterfaceName, extendedInterfacePackageName);
-                                int interfaceId = database.getClassId(interfaceDeclaration.getName(), cu.getPackage().getPackageName());
+                                int interfaceId = database.getInterfaceId(interfaceDeclaration.getName(), cu.getPackage().getPackageName());
                                 database.save(new Extends(interfaceId, extendedInterfaceId));
                             }
                         }
@@ -172,8 +172,13 @@ public class Indexer {
                                 String implementedInterfacePackageName = ((CompilationUnit) implementedInterface.getParentNode().getParentNode()).getPackage().getPackageName();
                                 if (database.existInterface(implementedInterfaceName, implementedInterfacePackageName)) { // JDK interfaces are not indexed
                                     int interfaceId = database.getInterfaceId(implementedInterfaceName, implementedInterfacePackageName);
-                                    int classId = database.getClassId(type.getName(), cu.getPackage().getPackageName());
-                                    database.save(new Implements(classId, interfaceId));
+                                    int nbClasses = database.countClass(type.getName(), cu.getPackage().getPackageName());
+                                    if (nbClasses > 1) {
+                                        System.err.println("More than one class having the same name '" + type.getName() + "' and package '" + cu.getPackage().getPackageName() + "'");
+                                    } else {
+                                        int classId = database.getClassId(type.getName(), cu.getPackage().getPackageName());
+                                        database.save(new Implements(classId, interfaceId));
+                                    }
                                 }
                             }
                             // check if this class extends another class and persist relation in EXTENDS table
@@ -183,8 +188,13 @@ public class Indexer {
                                 String extendedClassPackageName = ((CompilationUnit) extendedClass.getParentNode().getParentNode()).getPackage().getPackageName();
                                 if (database.existClass(extendedClassName, extendedClassPackageName)) { // JDK classes are not indexed
                                     int extendedClassId = database.getClassId(extendedClassName, extendedClassPackageName);
-                                    int classId = database.getClassId(classDeclaration.getName(), cu.getPackage().getPackageName());
-                                    database.save(new Extends(classId, extendedClassId));
+                                    int nbClasses = database.countClass(type.getName(), cu.getPackage().getPackageName());
+                                    if (nbClasses > 1) {
+                                        System.err.println("More than one class having the same name '" + type.getName() + "' and package '" + cu.getPackage().getPackageName() + "'");
+                                    } else {
+                                        int classId = database.getClassId(classDeclaration.getName(), cu.getPackage().getPackageName());
+                                        database.save(new Extends(classId, extendedClassId));
+                                    }
                                 }
                             }
                         }
