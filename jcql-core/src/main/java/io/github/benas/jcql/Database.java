@@ -24,7 +24,6 @@
 package io.github.benas.jcql;
 
 import io.github.benas.jcql.model.*;
-import io.github.benas.jcql.model.Class;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -45,20 +44,17 @@ public class Database {
         jdbcTemplate.update("insert into COMPILATION_UNIT values (?,?,?)", compilationUnit.getId(), compilationUnit.getFileName(), compilationUnit.getPackageDeclaration());
     }
 
-    public void save(Class type) {
-        jdbcTemplate.update("insert into CLASS values (?,?,?,?,?,?)", type.getId(), type.getName(), toSqliteBoolean(type.isAbstract()), toSqliteBoolean(type.isFinal()), toSqliteBoolean(type.isPublic()), type.getCompilationUnitId());
-    }
-
-    public void save(Interface type) {
-        jdbcTemplate.update("insert into INTERFACE values (?,?,?,?,?)", type.getId(), type.getName(), toSqliteBoolean(type.isFinal()), toSqliteBoolean(type.isPublic()), type.getCompilationUnitId());
-    }
-
-    public void save(Annotation annotation) {
-        jdbcTemplate.update("insert into ANNOTATION values (?,?,?,?)", annotation.getId(), annotation.getName(), toSqliteBoolean(annotation.isPublic()), annotation.getCompilationUnitId());
-    }
-
-    public void save(Enumeration enumeration) {
-        jdbcTemplate.update("insert into ENUMERATION values (?,?,?,?)", enumeration.getId(), enumeration.getName(), toSqliteBoolean(enumeration.isPublic()), enumeration.getCompilationUnitId());
+    public void save(Type type) {
+        jdbcTemplate.update("insert into TYPE values (?,?,?,?,?,?,?,?,?,?,?)", type.getId(), type.getName(),
+                toSqliteBoolean(type.isPublic()),
+                toSqliteBoolean(type.isStatic()),
+                toSqliteBoolean(type.isFinal()),
+                toSqliteBoolean(type.isAbstract()),
+                toSqliteBoolean(type.isClass()),
+                toSqliteBoolean(type.isInterface()),
+                toSqliteBoolean(type.isEnumeration()),
+                toSqliteBoolean(type.isAnnotation()),
+                type.getCompilationUnitId());
     }
 
     public void save(Field field) {
@@ -67,12 +63,14 @@ public class Database {
                 toSqliteBoolean(field.isPublic()), toSqliteBoolean(field.isStatic()), toSqliteBoolean(field.isFinal()), toSqliteBoolean(field.isTransient()), field.getTypeId());
     }
 
-    public void save(Constructor constructor) {
-        jdbcTemplate.update("insert into CONSTRUCTOR values (?,?,?,?)", constructor.getId(), constructor.getName(), toSqliteBoolean(constructor.isPublic()), constructor.getTypeId());
-    }
-
     public void save(Method method) {
-        jdbcTemplate.update("insert into METHOD values (?,?,?,?,?,?)", method.getId(), method.getName(), toSqliteBoolean(method.isAbstract()), toSqliteBoolean(method.isFinal()), toSqliteBoolean(method.isPublic()), method.getTypeId());
+        jdbcTemplate.update("insert into METHOD values (?,?,?,?,?,?,?,?)", method.getId(), method.getName(),
+                toSqliteBoolean(method.isPublic()),
+                toSqliteBoolean(method.isStatic()),
+                toSqliteBoolean(method.isFinal()),
+                toSqliteBoolean(method.isAbstract()),
+                toSqliteBoolean(method.isConstructor()),
+                method.getTypeId());
     }
 
     public void save(Parameter parameter) {

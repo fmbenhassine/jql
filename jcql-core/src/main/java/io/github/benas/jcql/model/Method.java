@@ -26,23 +26,22 @@ package io.github.benas.jcql.model;
 public class Method {
 
     private int id;
-
     private String name;
-
-    private boolean isAbstract;
-
-    private boolean isFinal;
-
     private boolean isPublic;
-
+    private boolean isStatic;
+    private boolean isFinal;
+    private boolean isAbstract;
+    private boolean isConstructor;
     private int typeId;
 
-    public Method(int id, String name, boolean isAbstract, boolean isFinal, boolean isPublic, int typeId) {
+    public Method(int id, String name, boolean isPublic, boolean isStatic, boolean isFinal, boolean isAbstract, boolean isConstructor, int typeId) {
         this.id = id;
         this.name = name;
-        this.isAbstract = isAbstract;
-        this.isFinal = isFinal;
         this.isPublic = isPublic;
+        this.isStatic = isStatic;
+        this.isFinal = isFinal;
+        this.isAbstract = isAbstract;
+        this.isConstructor = isConstructor;
         this.typeId = typeId;
     }
 
@@ -68,5 +67,13 @@ public class Method {
 
     public boolean isPublic() {
         return isPublic;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
+    }
+
+    public boolean isConstructor() {
+        return isConstructor;
     }
 }

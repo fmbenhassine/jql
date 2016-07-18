@@ -26,7 +26,7 @@ package io.github.benas.jcql.code;
 @Bar(important = true)
 public class Foo extends AbstractFoo implements Named, Gendered {
 
-    private String name;
+    private String name, nickName;
 
     private Gender gender;
 

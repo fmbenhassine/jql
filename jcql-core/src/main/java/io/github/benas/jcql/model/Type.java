@@ -23,23 +23,31 @@
  */
 package io.github.benas.jcql.model;
 
-public abstract class Type {
+public class Type {
 
     protected int id;
-
     protected String name;
-
-    protected boolean isFinal;
-
     protected boolean isPublic;
-
+    protected boolean isStatic;
+    protected boolean isFinal;
+    protected boolean isAbstract;
+    protected boolean isClass;
+    protected boolean isInterface;
+    protected boolean isEnumeration;
+    protected boolean isAnnotation;
     protected int compilationUnitId;
 
-    public Type(int id, String name, boolean isFinal, boolean isPublic, int compilationUnitId) {
+    public Type(int id, String name, boolean isPublic, boolean isStatic, boolean isFinal, boolean isAbstract, boolean isClass, boolean isInterface, boolean isEnumeration, boolean isAnnotation, int compilationUnitId) {
         this.id = id;
         this.name = name;
-        this.isFinal = isFinal;
         this.isPublic = isPublic;
+        this.isStatic = isStatic;
+        this.isFinal = isFinal;
+        this.isAbstract = isAbstract;
+        this.isClass = isClass;
+        this.isInterface = isInterface;
+        this.isEnumeration = isEnumeration;
+        this.isAnnotation = isAnnotation;
         this.compilationUnitId = compilationUnitId;
     }
 
@@ -62,5 +70,29 @@ public abstract class Type {
 
     public boolean isPublic() {
         return isPublic;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
+    }
+
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+
+    public boolean isClass() {
+        return isClass;
+    }
+
+    public boolean isInterface() {
+        return isInterface;
+    }
+
+    public boolean isEnumeration() {
+        return isEnumeration;
+    }
+
+    public boolean isAnnotation() {
+        return isAnnotation;
     }
 }

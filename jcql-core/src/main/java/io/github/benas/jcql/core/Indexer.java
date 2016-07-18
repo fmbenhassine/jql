@@ -30,7 +30,6 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import io.github.benas.jcql.Database;
 import io.github.benas.jcql.model.*;
-import io.github.benas.jcql.model.Class;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -74,49 +73,34 @@ public class Indexer {
                     boolean isInterface = type instanceof ClassOrInterfaceDeclaration && ((ClassOrInterfaceDeclaration) type).isInterface();
                     boolean isAnnotation = type instanceof AnnotationDeclaration;
                     boolean isEnumeration = type instanceof EnumDeclaration;
+                    boolean isClass = !isAnnotation && !isEnumeration && !isInterface;
                     typeId++;
-                    if (isInterface) {
-                        Interface interfaze = new Interface(typeId, type.getName(), isFinal(modifiers), isPublic(modifiers), cuId);
-                        database.save(interfaze);
-                    } else {
-                        if (isAnnotation) {
-                            Annotation annotation = new Annotation(typeId, type.getName(), false, isPublic(modifiers), cuId);
-                            database.save(annotation);
-                        } else if (isEnumeration) {
-                            Enumeration enumeration = new Enumeration(typeId, type.getName(), isPublic(modifiers), cuId);
-                            database.save(enumeration);
-                        } else {
-                            Class clazz = new Class(typeId, type.getName(), isAbstract(modifiers), isFinal(modifiers), isPublic(modifiers), cuId);
-                            database.save(clazz);
-                        }
-                    }
+                    Type t = new Type(typeId, type.getName(), isPublic(modifiers), isStatic(modifiers), isFinal(modifiers), isAbstract(modifiers), isClass, isInterface, isEnumeration, isAnnotation, cuId);
+                    database.save(t);
 
                     for (BodyDeclaration member : type.getMembers()) {
-                        if (member instanceof FieldDeclaration) {
+                        boolean isField = member instanceof FieldDeclaration;
+                        boolean isMethod = member instanceof MethodDeclaration;
+                        boolean isConstructor = member instanceof ConstructorDeclaration;
+                        if (isField) {
                             FieldDeclaration fieldDeclaration = (FieldDeclaration) member;
-                            fieldId++;
                             int fieldModifiers = fieldDeclaration.getModifiers();
-                            String name = fieldDeclaration.getVariables().get(0).getId().getName(); // TODO add support for multiple fields, ex: private String firstName, lastName;
-                            database.save(new Field(fieldId, name, fieldDeclaration.getType().toString(),
-                                    isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeId));
-                        }
-                        if (member instanceof ConstructorDeclaration) {
-                            ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) member;
-                            methodId++;
-                            database.save(new Constructor(methodId, constructorDeclaration.getName(), isPublic(constructorDeclaration.getModifiers()), typeId));
-                            List<Parameter> parameters = constructorDeclaration.getParameters();
-                            for (Parameter parameter : parameters) {
-                                parameterId++;
-                                io.github.benas.jcql.model.Parameter p = new io.github.benas.jcql.model.Parameter(parameterId, parameter.getId().getName(), parameter.getType().toString(), methodId);
-                                database.save(p);
+                            List<VariableDeclarator> variables = fieldDeclaration.getVariables();
+                            for (VariableDeclarator variable : variables) {
+                                String name = variable.getId().getName();
+                                fieldId++;
+                                database.save(new Field(fieldId, name, fieldDeclaration.getType().toString(),
+                                        isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeId));
                             }
+
                         }
-                        if (member instanceof MethodDeclaration) {
-                            MethodDeclaration methodDeclaration = (MethodDeclaration) member;
+                        if (isConstructor || isMethod) {
                             methodId++;
-                            int methodModifiers = methodDeclaration.getModifiers();
-                            database.save(new Method(methodId, methodDeclaration.getName(), isAbstract(methodModifiers), isFinal(methodModifiers), isPublic(methodModifiers), typeId));
-                            List<Parameter> parameters = methodDeclaration.getParameters();
+                            int methodModifiers = isMethod ? ((MethodDeclaration) member).getModifiers() : ((ConstructorDeclaration) member).getModifiers();
+                            List<Parameter> parameters = isMethod ? ((MethodDeclaration) member).getParameters() : ((ConstructorDeclaration) member).getParameters();
+                            String name = isMethod ? ((MethodDeclaration) member).getName() : ((ConstructorDeclaration) member).getName();
+                            database.save(new Method(methodId, name,
+                                    isPublic(methodModifiers), isStatic(methodModifiers), isFinal(methodModifiers), isAbstract(methodModifiers), isConstructor, typeId));
                             for (Parameter parameter : parameters) {
                                 parameterId++;
                                 io.github.benas.jcql.model.Parameter p = new io.github.benas.jcql.model.Parameter(parameterId, parameter.getId().getName(), parameter.getType().toString(), methodId);
@@ -126,7 +110,9 @@ public class Indexer {
                         if (member instanceof AnnotationMemberDeclaration) {
                             AnnotationMemberDeclaration annotationMemberDeclaration = (AnnotationMemberDeclaration) member;
                             methodId++;
-                            database.save(new Method(methodId, annotationMemberDeclaration.getName(), false, false, true, typeId));
+                            int annotationMemberModifiers = annotationMemberDeclaration.getModifiers();
+                            database.save(new Method(methodId, annotationMemberDeclaration.getName(),
+                                    isPublic(annotationMemberModifiers), isStatic(annotationMemberModifiers), isFinal(annotationMemberModifiers), isAbstract(annotationMemberModifiers), false, typeId));
                         }
                     }
                 }
