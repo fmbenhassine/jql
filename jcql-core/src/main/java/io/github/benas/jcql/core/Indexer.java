@@ -28,7 +28,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import io.github.benas.jcql.Database;
+import io.github.benas.jcql.domain.*;
 import io.github.benas.jcql.model.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -44,13 +44,37 @@ import static org.apache.commons.io.FileUtils.*;
 
 public class Indexer {
 
+    private File databaseDirectory;
+    private DatabaseInitializer databaseInitializer;
+
+    private CompilationUnitDao compilationUnitDao;
+    private TypeDao typeDao;
+    private FieldDao fieldDao;
+    private MethodDao methodDao;
+    private ParameterDao parameterDao;
+    private ExtendsDao extendsDao;
+    private ImplementsDao implementsDao;
+
+    public Indexer(File databaseDirectory) {
+        DataSource dataSource = getDataSourceFrom(databaseDirectory);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        this.databaseDirectory = databaseDirectory;
+        databaseInitializer = new DatabaseInitializer(databaseDirectory);
+        compilationUnitDao = new CompilationUnitDao(jdbcTemplate);
+        typeDao = new TypeDao(jdbcTemplate);
+        fieldDao = new FieldDao(jdbcTemplate);
+        methodDao = new MethodDao(jdbcTemplate);
+        parameterDao = new ParameterDao(jdbcTemplate);
+        extendsDao = new ExtendsDao(jdbcTemplate);
+        implementsDao = new ImplementsDao(jdbcTemplate);
+    }
+
     /*
      * TODO: the following is an early unfinished POC to clean up! A software craftsman never writes code like this ;-) :wink:
      */
-    public void index(File sourceCodeDirectory, File databaseDirectory) throws IOException {
+    public void index(File sourceCodeDirectory) throws IOException {
         System.out.println("Indexing source code in " + sourceCodeDirectory.getAbsolutePath() + " in database " + getDatabasePath(databaseDirectory));
-        initDatabaseIn(databaseDirectory);
-        Database database = new Database(databaseDirectory);
+        databaseInitializer.initDatabase();
 
         Collection<File> files = listFiles(sourceCodeDirectory, new String[]{"java"}, true);
         int totalFiles = files.size();
@@ -66,7 +90,7 @@ public class Indexer {
                 cuId++;
                 String packageName = cu.getPackage() != null ? cu.getPackage().getPackageName() : "";
                 io.github.benas.jcql.model.CompilationUnit compilationUnit = new io.github.benas.jcql.model.CompilationUnit(cuId, file.getName(), packageName);
-                database.save(compilationUnit);
+                compilationUnitDao.save(compilationUnit);
                 List<TypeDeclaration> types = cu.getTypes();
                 for (TypeDeclaration type : types) {
                     int modifiers = type.getModifiers();
@@ -76,7 +100,7 @@ public class Indexer {
                     boolean isClass = !isAnnotation && !isEnumeration && !isInterface;
                     typeId++;
                     Type t = new Type(typeId, type.getName(), isPublic(modifiers), isStatic(modifiers), isFinal(modifiers), isAbstract(modifiers), isClass, isInterface, isEnumeration, isAnnotation, cuId);
-                    database.save(t);
+                    typeDao.save(t);
 
                     for (BodyDeclaration member : type.getMembers()) {
                         boolean isField = member instanceof FieldDeclaration;
@@ -89,7 +113,7 @@ public class Indexer {
                             for (VariableDeclarator variable : variables) {
                                 String name = variable.getId().getName();
                                 fieldId++;
-                                database.save(new Field(fieldId, name, fieldDeclaration.getType().toString(),
+                                fieldDao.save(new Field(fieldId, name, fieldDeclaration.getType().toString(),
                                         isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeId));
                             }
 
@@ -99,19 +123,19 @@ public class Indexer {
                             int methodModifiers = isMethod ? ((MethodDeclaration) member).getModifiers() : ((ConstructorDeclaration) member).getModifiers();
                             List<Parameter> parameters = isMethod ? ((MethodDeclaration) member).getParameters() : ((ConstructorDeclaration) member).getParameters();
                             String name = isMethod ? ((MethodDeclaration) member).getName() : ((ConstructorDeclaration) member).getName();
-                            database.save(new Method(methodId, name,
+                            methodDao.save(new Method(methodId, name,
                                     isPublic(methodModifiers), isStatic(methodModifiers), isFinal(methodModifiers), isAbstract(methodModifiers), isConstructor, typeId));
                             for (Parameter parameter : parameters) {
                                 parameterId++;
                                 io.github.benas.jcql.model.Parameter p = new io.github.benas.jcql.model.Parameter(parameterId, parameter.getId().getName(), parameter.getType().toString(), methodId);
-                                database.save(p);
+                                parameterDao.save(p);
                             }
                         }
                         if (member instanceof AnnotationMemberDeclaration) {
                             AnnotationMemberDeclaration annotationMemberDeclaration = (AnnotationMemberDeclaration) member;
                             methodId++;
                             int annotationMemberModifiers = annotationMemberDeclaration.getModifiers();
-                            database.save(new Method(methodId, annotationMemberDeclaration.getName(),
+                            methodDao.save(new Method(methodId, annotationMemberDeclaration.getName(),
                                     isPublic(annotationMemberModifiers), isStatic(annotationMemberModifiers), isFinal(annotationMemberModifiers), isAbstract(annotationMemberModifiers), false, typeId));
                         }
                     }
@@ -145,10 +169,10 @@ public class Indexer {
                         for (ClassOrInterfaceType extendedInterface : extendedInterfaces) {
                             String extendedInterfaceName = extendedInterface.getName();
                             String extendedInterfacePackageName = ((CompilationUnit) extendedInterface.getParentNode().getParentNode()).getPackage().getPackageName();
-                            if (database.existInterface(extendedInterfaceName, extendedInterfacePackageName)) { // JDK interfaces are not indexed
-                                int extendedInterfaceId = database.getInterfaceId(extendedInterfaceName, extendedInterfacePackageName);
-                                int interfaceId = database.getInterfaceId(interfaceDeclaration.getName(), cu.getPackage().getPackageName());
-                                database.save(new Extends(interfaceId, extendedInterfaceId));
+                            if (typeDao.existInterface(extendedInterfaceName, extendedInterfacePackageName)) { // JDK interfaces are not indexed
+                                int extendedInterfaceId = typeDao.getInterfaceId(extendedInterfaceName, extendedInterfacePackageName);
+                                int interfaceId = typeDao.getInterfaceId(interfaceDeclaration.getName(), cu.getPackage().getPackageName());
+                                extendsDao.save(new Extends(interfaceId, extendedInterfaceId));
                             }
                         }
                     } else {
@@ -160,14 +184,14 @@ public class Indexer {
                             for (ClassOrInterfaceType implementedInterface : implementedInterfaces) {
                                 String implementedInterfaceName = implementedInterface.getName();
                                 String implementedInterfacePackageName = ((CompilationUnit) implementedInterface.getParentNode().getParentNode()).getPackage().getPackageName();
-                                if (database.existInterface(implementedInterfaceName, implementedInterfacePackageName)) { // JDK interfaces are not indexed
-                                    int interfaceId = database.getInterfaceId(implementedInterfaceName, implementedInterfacePackageName);
-                                    int nbClasses = database.countClass(type.getName(), cu.getPackage().getPackageName());
+                                if (typeDao.existInterface(implementedInterfaceName, implementedInterfacePackageName)) { // JDK interfaces are not indexed
+                                    int interfaceId = typeDao.getInterfaceId(implementedInterfaceName, implementedInterfacePackageName);
+                                    int nbClasses = typeDao.countClass(type.getName(), cu.getPackage().getPackageName());
                                     if (nbClasses > 1) {
                                         System.err.println("More than one class having the same name '" + type.getName() + "' and package '" + cu.getPackage().getPackageName() + "'");
                                     } else {
-                                        int classId = database.getClassId(type.getName(), cu.getPackage().getPackageName());
-                                        database.save(new Implements(classId, interfaceId));
+                                        int classId = typeDao.getClassId(type.getName(), cu.getPackage().getPackageName());
+                                        implementsDao.save(new Implements(classId, interfaceId));
                                     }
                                 }
                             }
@@ -176,14 +200,14 @@ public class Indexer {
                             for (ClassOrInterfaceType extendedClass : extendedClasses) {
                                 String extendedClassName = extendedClass.getName();
                                 String extendedClassPackageName = ((CompilationUnit) extendedClass.getParentNode().getParentNode()).getPackage().getPackageName();
-                                if (database.existClass(extendedClassName, extendedClassPackageName)) { // JDK classes are not indexed
-                                    int extendedClassId = database.getClassId(extendedClassName, extendedClassPackageName);
-                                    int nbClasses = database.countClass(type.getName(), cu.getPackage().getPackageName());
+                                if (typeDao.existClass(extendedClassName, extendedClassPackageName)) { // JDK classes are not indexed
+                                    int extendedClassId = typeDao.getClassId(extendedClassName, extendedClassPackageName);
+                                    int nbClasses = typeDao.countClass(type.getName(), cu.getPackage().getPackageName());
                                     if (nbClasses > 1) {
                                         System.err.println("More than one class having the same name '" + type.getName() + "' and package '" + cu.getPackage().getPackageName() + "'");
                                     } else {
-                                        int classId = database.getClassId(classDeclaration.getName(), cu.getPackage().getPackageName());
-                                        database.save(new Extends(classId, extendedClassId));
+                                        int classId = typeDao.getClassId(classDeclaration.getName(), cu.getPackage().getPackageName());
+                                        extendsDao.save(new Extends(classId, extendedClassId));
                                     }
                                 }
                             }
@@ -210,28 +234,11 @@ public class Indexer {
         File sourceCodeDirectory = new File(sourceCodeDir);
         File databaseDirectory = new File(databaseDir);
 
-        Indexer indexer = new Indexer();
-        indexer.index(sourceCodeDirectory, databaseDirectory);
+        Indexer indexer = new Indexer(databaseDirectory);
+        indexer.index(sourceCodeDirectory);
     }
 
 
-    private static void initDatabaseIn(File directory) throws IOException {
-        File database = getFile(getDatabasePath(directory));
-        deleteQuietly(database);
-        touch(database);
-        DataSource dataSource = getDataSourceFrom(directory);
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        applyDDL(jdbcTemplate);
-    }
 
-    private static void applyDDL(JdbcTemplate jdbcTemplate) throws IOException {
-        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream("database.sql");
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
-            String line;
-            while((line = bufferedReader.readLine()) != null) {
-                jdbcTemplate.update(line);
-            }
-        }
-    }
 
 }

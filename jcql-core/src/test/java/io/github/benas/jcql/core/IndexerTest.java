@@ -23,43 +23,49 @@
  */
 package io.github.benas.jcql.core;
 
-import io.github.benas.jcql.Database;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.File;
 
+import static io.github.benas.jcql.Utils.getDataSourceFrom;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class IndexerTest {
 
-    private File sourceCodeDirectory, databaseDirectory;
+    private File sourceCodeDirectory;
+
+    private JdbcTemplate jdbcTemplate;
 
     private Indexer indexer;
 
     @Before
     public void setUp() throws Exception {
-        indexer = new Indexer();
+        File databaseDirectory = new File("target").getAbsoluteFile();
         sourceCodeDirectory = new File("src/test/java/io/github/benas/jcql/code").getAbsoluteFile();
-        databaseDirectory = new File("target").getAbsoluteFile();
+        indexer = new Indexer(databaseDirectory);
+        jdbcTemplate = new JdbcTemplate(getDataSourceFrom(databaseDirectory));
     }
 
     @Test
     public void testCodeIndexing() throws Exception {
-        indexer.index(sourceCodeDirectory, databaseDirectory);
+        indexer.index(sourceCodeDirectory);
 
-        Database database = new Database(databaseDirectory);
+        assertThat(count("class")).isEqualTo(2);
+        assertThat(count("interface")).isEqualTo(2);
+        assertThat(count("annotation")).isEqualTo(1);
+        assertThat(count("enumeration")).isEqualTo(1);
+        assertThat(count("field")).isEqualTo(3);
+        assertThat(count("constructor")).isEqualTo(1);
+        assertThat(count("method")).isEqualTo(7);
+        assertThat(count("parameter")).isEqualTo(2);
+        assertThat(count("implements")).isEqualTo(2);
+        assertThat(count("extends")).isEqualTo(1);
+        assertThat(count("compilation_unit")).isEqualTo(7);
+    }
 
-        assertThat(database.count("class")).isEqualTo(2);
-        assertThat(database.count("interface")).isEqualTo(2);
-        assertThat(database.count("annotation")).isEqualTo(1);
-        assertThat(database.count("enumeration")).isEqualTo(1);
-        assertThat(database.count("field")).isEqualTo(3);
-        assertThat(database.count("constructor")).isEqualTo(1);
-        assertThat(database.count("method")).isEqualTo(7);
-        assertThat(database.count("parameter")).isEqualTo(2);
-        assertThat(database.count("implements")).isEqualTo(2);
-        assertThat(database.count("extends")).isEqualTo(1);
-        assertThat(database.count("compilation_unit")).isEqualTo(7);
+    private int count(String table) {
+        return jdbcTemplate.queryForObject("select count(*) from " + table, Integer.class);
     }
 }

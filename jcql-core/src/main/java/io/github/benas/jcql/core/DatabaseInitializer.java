@@ -21,34 +21,41 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *   THE SOFTWARE.
  */
-package io.github.benas.jcql.maven;
+package io.github.benas.jcql.core;
 
-import io.github.benas.jcql.core.Indexer;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.File;
-import java.io.IOException;
+import javax.sql.DataSource;
+import java.io.*;
 
-@Mojo(name = "index", aggregator = true)
-public class JcqlMojo extends AbstractMojo {
+import static io.github.benas.jcql.Utils.getDataSourceFrom;
+import static io.github.benas.jcql.Utils.getDatabasePath;
+import static org.apache.commons.io.FileUtils.*;
 
-    @Parameter(defaultValue = "${project.basedir}", readonly = true)
-    private File sourceCodeDirectory;
+public class DatabaseInitializer {
 
-    @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     private File databaseDirectory;
 
-    private Indexer indexer = new Indexer(databaseDirectory);
+    public DatabaseInitializer(File databaseDirectory) {
+        this.databaseDirectory = databaseDirectory;
+    }
 
-    public void execute() throws MojoExecutionException {
-        try {
-            indexer.index(sourceCodeDirectory);
-            getLog().info("Done.");
-        } catch (IOException e) {
-            throw new MojoExecutionException("Unable to index jcql database in " + sourceCodeDirectory, e);
+    public void initDatabase() throws IOException {
+        File database = getFile(getDatabasePath(databaseDirectory));
+        deleteQuietly(database);
+        touch(database);
+        DataSource dataSource = getDataSourceFrom(databaseDirectory);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        applyDDL(jdbcTemplate);
+    }
+
+    private static void applyDDL(JdbcTemplate jdbcTemplate) throws IOException {
+        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream("database.sql");
+        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
+            String line;
+            while((line = bufferedReader.readLine()) != null) {
+                jdbcTemplate.update(line);
+            }
         }
     }
 }

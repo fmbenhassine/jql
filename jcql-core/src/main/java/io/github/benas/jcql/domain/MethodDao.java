@@ -21,34 +21,25 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *   THE SOFTWARE.
  */
-package io.github.benas.jcql.maven;
+package io.github.benas.jcql.domain;
 
-import io.github.benas.jcql.core.Indexer;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import io.github.benas.jcql.model.Method;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.File;
-import java.io.IOException;
+public class MethodDao extends BaseDao {
 
-@Mojo(name = "index", aggregator = true)
-public class JcqlMojo extends AbstractMojo {
-
-    @Parameter(defaultValue = "${project.basedir}", readonly = true)
-    private File sourceCodeDirectory;
-
-    @Parameter(defaultValue = "${project.build.directory}", readonly = true)
-    private File databaseDirectory;
-
-    private Indexer indexer = new Indexer(databaseDirectory);
-
-    public void execute() throws MojoExecutionException {
-        try {
-            indexer.index(sourceCodeDirectory);
-            getLog().info("Done.");
-        } catch (IOException e) {
-            throw new MojoExecutionException("Unable to index jcql database in " + sourceCodeDirectory, e);
-        }
+    public MethodDao(JdbcTemplate jdbcTemplate) {
+        super(jdbcTemplate);
     }
+
+    public void save(Method method) {
+        jdbcTemplate.update("insert into METHOD values (?,?,?,?,?,?,?,?)", method.getId(), method.getName(),
+                toSqliteBoolean(method.isPublic()),
+                toSqliteBoolean(method.isStatic()),
+                toSqliteBoolean(method.isFinal()),
+                toSqliteBoolean(method.isAbstract()),
+                toSqliteBoolean(method.isConstructor()),
+                method.getTypeId());
+    }
+
 }
