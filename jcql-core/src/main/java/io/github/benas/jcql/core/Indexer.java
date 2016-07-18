@@ -46,7 +46,7 @@ import static org.apache.commons.io.FileUtils.*;
 public class Indexer {
 
     /*
-     * TODO: the following is still an early unfinished POC to clean up
+     * TODO: the following is an early unfinished POC to clean up! A software craftsman never writes code like this ;-) :wink:
      */
     public void index(File sourceCodeDirectory, File databaseDirectory) throws IOException {
         System.out.println("Indexing source code in " + sourceCodeDirectory.getAbsolutePath() + " in database " + getDatabasePath(databaseDirectory));
@@ -137,7 +137,11 @@ public class Indexer {
             fileIndex++;
         }
 
-        // Inefficient 2 phases algorithm: to optimize in one phase if possible
+        // FIXME Inefficient 2 phases algorithm:
+        // phase 1: index all types (classes, interfaces, fields, methods, etc)
+        // phase 2: calculate relations (implements, extends) once all IDs have been assigned in phase 1
+        // TODO to optimize in one phase if possible
+        // TODO Looks like Sqlite3 is thread safe (Q6 in https://www.sqlite.org/faq.html). The 2nd step (calculating relations) can be done in parallel
         System.out.println();
         System.out.println("Indexing relations..");
         for (File file : files) {
