@@ -57,7 +57,7 @@ public class Indexer {
         int totalFiles = files.size();
         int fileIndex = 1;
         int cuId = 0;
-        int typeIdId = 0;
+        int typeId = 0;
         int fieldId = 0;
         int methodId = 0;
         int parameterId = 0;
@@ -74,19 +74,19 @@ public class Indexer {
                     boolean isInterface = type instanceof ClassOrInterfaceDeclaration && ((ClassOrInterfaceDeclaration) type).isInterface();
                     boolean isAnnotation = type instanceof AnnotationDeclaration;
                     boolean isEnumeration = type instanceof EnumDeclaration;
-                    typeIdId++;
+                    typeId++;
                     if (isInterface) {
-                        Interface interfaze = new Interface(typeIdId, type.getName(), isFinal(modifiers), isPublic(modifiers), cuId);
+                        Interface interfaze = new Interface(typeId, type.getName(), isFinal(modifiers), isPublic(modifiers), cuId);
                         database.save(interfaze);
                     } else {
                         if (isAnnotation) {
-                            Annotation annotation = new Annotation(typeIdId, type.getName(), false, isPublic(modifiers), cuId);
+                            Annotation annotation = new Annotation(typeId, type.getName(), false, isPublic(modifiers), cuId);
                             database.save(annotation);
                         } else if (isEnumeration) {
-                            Enumeration enumeration = new Enumeration(typeIdId, type.getName(), isPublic(modifiers), cuId);
+                            Enumeration enumeration = new Enumeration(typeId, type.getName(), isPublic(modifiers), cuId);
                             database.save(enumeration);
                         } else {
-                            Class clazz = new Class(typeIdId, type.getName(), isAbstract(modifiers), isFinal(modifiers), isPublic(modifiers), cuId);
+                            Class clazz = new Class(typeId, type.getName(), isAbstract(modifiers), isFinal(modifiers), isPublic(modifiers), cuId);
                             database.save(clazz);
                         }
                     }
@@ -98,12 +98,12 @@ public class Indexer {
                             int fieldModifiers = fieldDeclaration.getModifiers();
                             String name = fieldDeclaration.getVariables().get(0).getId().getName(); // TODO add support for multiple fields, ex: private String firstName, lastName;
                             database.save(new Field(fieldId, name, fieldDeclaration.getType().toString(),
-                                    isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeIdId));
+                                    isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeId));
                         }
                         if (member instanceof ConstructorDeclaration) {
                             ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) member;
                             methodId++;
-                            database.save(new Constructor(methodId, constructorDeclaration.getName(), isPublic(constructorDeclaration.getModifiers()), typeIdId));
+                            database.save(new Constructor(methodId, constructorDeclaration.getName(), isPublic(constructorDeclaration.getModifiers()), typeId));
                             List<Parameter> parameters = constructorDeclaration.getParameters();
                             for (Parameter parameter : parameters) {
                                 parameterId++;
@@ -115,7 +115,7 @@ public class Indexer {
                             MethodDeclaration methodDeclaration = (MethodDeclaration) member;
                             methodId++;
                             int methodModifiers = methodDeclaration.getModifiers();
-                            database.save(new Method(methodId, methodDeclaration.getName(), isAbstract(methodModifiers), isFinal(methodModifiers), isPublic(methodModifiers), typeIdId));
+                            database.save(new Method(methodId, methodDeclaration.getName(), isAbstract(methodModifiers), isFinal(methodModifiers), isPublic(methodModifiers), typeId));
                             List<Parameter> parameters = methodDeclaration.getParameters();
                             for (Parameter parameter : parameters) {
                                 parameterId++;
@@ -126,7 +126,7 @@ public class Indexer {
                         if (member instanceof AnnotationMemberDeclaration) {
                             AnnotationMemberDeclaration annotationMemberDeclaration = (AnnotationMemberDeclaration) member;
                             methodId++;
-                            database.save(new Method(methodId, annotationMemberDeclaration.getName(), false, false, true, typeIdId));
+                            database.save(new Method(methodId, annotationMemberDeclaration.getName(), false, false, true, typeId));
                         }
                     }
                 }
