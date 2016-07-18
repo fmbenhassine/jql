@@ -24,6 +24,7 @@
 package io.github.benas.jcql;
 
 import io.github.benas.jcql.model.*;
+import io.github.benas.jcql.model.Package;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -42,6 +43,10 @@ public class Database {
 
     public void save(CompilationUnit compilationUnit) {
         jdbcTemplate.update("insert into COMPILATION_UNIT values (?,?,?)", compilationUnit.getId(), compilationUnit.getFileName(), compilationUnit.getPackageDeclaration());
+    }
+
+    public void save(Package aPackage) {
+        jdbcTemplate.update("insert into PACKAGE values (?,?)", aPackage.getId(), aPackage.getName());
     }
 
     public void save(Type type) {
@@ -109,6 +114,10 @@ public class Database {
         return jdbcTemplate.queryForObject("select count(c.id) from class c, compilation_unit cu where c.cu_id = cu.id and c.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class) == 1;
     }
 
+    public boolean existPackage(String packageName) {
+        return jdbcTemplate.queryForObject("select count(id) from package where name = ?", new Object[]{packageName}, Integer.class) != 0;
+    }
+
     // SQLITE 3 does not support boolean ..
     private int toSqliteBoolean(boolean bool) {
         return bool ? 1 : 0;
@@ -117,5 +126,6 @@ public class Database {
     private boolean fromSqliteBoolean(int bool) {
         return bool == 1;
     }
+
 
 }

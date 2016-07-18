@@ -30,6 +30,7 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import io.github.benas.jcql.Database;
 import io.github.benas.jcql.model.*;
+import io.github.benas.jcql.model.Package;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -60,11 +61,16 @@ public class Indexer {
         int fieldId = 0;
         int methodId = 0;
         int parameterId = 0;
+        int packageId = 0;
         for (File file : files) {
             try {
                 CompilationUnit cu = parse(file);
-                cuId++;
                 String packageName = cu.getPackage() != null ? cu.getPackage().getPackageName() : "";
+                if (!database.existPackage(packageName)) {
+                    packageId++;
+                    database.save(new Package(packageId, packageName));
+                }
+                cuId++;
                 io.github.benas.jcql.model.CompilationUnit compilationUnit = new io.github.benas.jcql.model.CompilationUnit(cuId, file.getName(), packageName);
                 database.save(compilationUnit);
                 List<TypeDeclaration> types = cu.getTypes();

@@ -50,6 +50,7 @@ public class IndexerTest {
 
         Database database = new Database(databaseDirectory);
 
+        assertThat(database.count("package")).isEqualTo(1);
         assertThat(database.count("class")).isEqualTo(2);
         assertThat(database.count("interface")).isEqualTo(2);
         assertThat(database.count("annotation")).isEqualTo(1);
