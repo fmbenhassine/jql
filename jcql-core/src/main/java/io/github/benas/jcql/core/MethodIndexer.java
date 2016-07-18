@@ -23,41 +23,34 @@
  */
 package io.github.benas.jcql.core;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import io.github.benas.jcql.domain.MethodDao;
+import io.github.benas.jcql.model.Method;
 
-import javax.sql.DataSource;
-import java.io.*;
+import java.util.List;
 
-import static io.github.benas.jcql.Utils.getDataSourceFrom;
-import static io.github.benas.jcql.Utils.getDatabasePath;
-import static org.apache.commons.io.FileUtils.*;
+import static java.lang.reflect.Modifier.*;
 
-public class DatabaseInitializer {
+public class MethodIndexer {
 
-    private File databaseDirectory;
+    private MethodDao methodDao;
+    private ParameterIndexer parameterIndexer;
 
-    private JdbcTemplate jdbcTemplate;
-
-    public DatabaseInitializer(File databaseDirectory) {
-        this.databaseDirectory = databaseDirectory;
-        DataSource dataSource = getDataSourceFrom(databaseDirectory);
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    public MethodIndexer(MethodDao methodDao, ParameterIndexer parameterIndexer) {
+        this.methodDao = methodDao;
+        this.parameterIndexer = parameterIndexer;
     }
 
-    public void initDatabase() throws IOException {
-        File database = getFile(getDatabasePath(databaseDirectory));
-        deleteQuietly(database);
-        touch(database);
-        applyDDL("database.sql");
-    }
-
-    private void applyDDL(String schema) throws IOException {
-        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream(schema);
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
-            String line;
-            while((line = bufferedReader.readLine()) != null) {
-                jdbcTemplate.update(line);
-            }
+    public void index(MethodDeclaration methodDeclaration, int typeId) {
+        int methodModifiers = methodDeclaration.getModifiers();
+        List<Parameter> parameters = methodDeclaration.getParameters();
+        String name = methodDeclaration.getName();
+        int methodId = methodDao.save(new Method(name,
+                isPublic(methodModifiers), isStatic(methodModifiers), isFinal(methodModifiers), isAbstract(methodModifiers), false, typeId));
+        for (Parameter parameter : parameters) {
+            parameterIndexer.index(parameter, methodId);
         }
     }
+
 }

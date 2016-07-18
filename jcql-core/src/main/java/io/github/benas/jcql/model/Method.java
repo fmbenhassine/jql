@@ -34,6 +34,16 @@ public class Method {
     private boolean isConstructor;
     private int typeId;
 
+    public Method(String name, boolean isPublic, boolean isStatic, boolean isFinal, boolean isAbstract, boolean isConstructor, int typeId) {
+        this.name = name;
+        this.isPublic = isPublic;
+        this.isStatic = isStatic;
+        this.isFinal = isFinal;
+        this.isAbstract = isAbstract;
+        this.isConstructor = isConstructor;
+        this.typeId = typeId;
+    }
+
     public Method(int id, String name, boolean isPublic, boolean isStatic, boolean isFinal, boolean isAbstract, boolean isConstructor, int typeId) {
         this.id = id;
         this.name = name;

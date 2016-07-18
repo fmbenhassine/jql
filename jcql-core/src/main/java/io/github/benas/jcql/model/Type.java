@@ -37,6 +37,19 @@ public class Type {
     protected boolean isAnnotation;
     protected int compilationUnitId;
 
+    public Type(String name, boolean isPublic, boolean isStatic, boolean isFinal, boolean isAbstract, boolean isClass, boolean isInterface, boolean isEnumeration, boolean isAnnotation, int compilationUnitId) {
+        this.name = name;
+        this.isPublic = isPublic;
+        this.isStatic = isStatic;
+        this.isFinal = isFinal;
+        this.isAbstract = isAbstract;
+        this.isClass = isClass;
+        this.isInterface = isInterface;
+        this.isEnumeration = isEnumeration;
+        this.isAnnotation = isAnnotation;
+        this.compilationUnitId = compilationUnitId;
+    }
+
     public Type(int id, String name, boolean isPublic, boolean isStatic, boolean isFinal, boolean isAbstract, boolean isClass, boolean isInterface, boolean isEnumeration, boolean isAnnotation, int compilationUnitId) {
         this.id = id;
         this.name = name;

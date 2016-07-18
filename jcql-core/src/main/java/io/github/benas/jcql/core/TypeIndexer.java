@@ -23,41 +23,35 @@
  */
 package io.github.benas.jcql.core;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.github.javaparser.ast.body.*;
+import io.github.benas.jcql.domain.TypeDao;
+import io.github.benas.jcql.model.Type;
 
-import javax.sql.DataSource;
-import java.io.*;
+import static java.lang.reflect.Modifier.*;
 
-import static io.github.benas.jcql.Utils.getDataSourceFrom;
-import static io.github.benas.jcql.Utils.getDatabasePath;
-import static org.apache.commons.io.FileUtils.*;
+public class TypeIndexer {
 
-public class DatabaseInitializer {
+    private TypeDao typeDao;
 
-    private File databaseDirectory;
+    private BodyDeclarationIndexer bodyDeclarationIndexer;
 
-    private JdbcTemplate jdbcTemplate;
-
-    public DatabaseInitializer(File databaseDirectory) {
-        this.databaseDirectory = databaseDirectory;
-        DataSource dataSource = getDataSourceFrom(databaseDirectory);
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    public TypeIndexer(TypeDao typeDao, BodyDeclarationIndexer bodyDeclarationIndexer) {
+        this.typeDao = typeDao;
+        this.bodyDeclarationIndexer = bodyDeclarationIndexer;
     }
 
-    public void initDatabase() throws IOException {
-        File database = getFile(getDatabasePath(databaseDirectory));
-        deleteQuietly(database);
-        touch(database);
-        applyDDL("database.sql");
-    }
+    public void index(TypeDeclaration type, int cuId) {
+        int modifiers = type.getModifiers();
+        boolean isInterface = type instanceof ClassOrInterfaceDeclaration && ((ClassOrInterfaceDeclaration) type).isInterface();
+        boolean isAnnotation = type instanceof AnnotationDeclaration;
+        boolean isEnumeration = type instanceof EnumDeclaration;
+        boolean isClass = !isAnnotation && !isEnumeration && !isInterface;
 
-    private void applyDDL(String schema) throws IOException {
-        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream(schema);
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
-            String line;
-            while((line = bufferedReader.readLine()) != null) {
-                jdbcTemplate.update(line);
-            }
+        Type t = new Type(type.getName(), isPublic(modifiers), isStatic(modifiers), isFinal(modifiers), isAbstract(modifiers), isClass, isInterface, isEnumeration, isAnnotation, cuId);
+        int typeId = typeDao.save(t);
+
+        for (BodyDeclaration member : type.getMembers()) {
+            bodyDeclarationIndexer.index(member, typeId);
         }
     }
 }

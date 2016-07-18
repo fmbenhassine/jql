@@ -23,41 +23,24 @@
  */
 package io.github.benas.jcql.core;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
+import io.github.benas.jcql.domain.MethodDao;
+import io.github.benas.jcql.model.Method;
 
-import javax.sql.DataSource;
-import java.io.*;
+import static java.lang.reflect.Modifier.*;
 
-import static io.github.benas.jcql.Utils.getDataSourceFrom;
-import static io.github.benas.jcql.Utils.getDatabasePath;
-import static org.apache.commons.io.FileUtils.*;
+public class AnnotationMemberIndexer {
 
-public class DatabaseInitializer {
+    private MethodDao methodDao;
 
-    private File databaseDirectory;
-
-    private JdbcTemplate jdbcTemplate;
-
-    public DatabaseInitializer(File databaseDirectory) {
-        this.databaseDirectory = databaseDirectory;
-        DataSource dataSource = getDataSourceFrom(databaseDirectory);
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    public AnnotationMemberIndexer(MethodDao methodDao) {
+        this.methodDao = methodDao;
     }
 
-    public void initDatabase() throws IOException {
-        File database = getFile(getDatabasePath(databaseDirectory));
-        deleteQuietly(database);
-        touch(database);
-        applyDDL("database.sql");
+    public void index(AnnotationMemberDeclaration annotationMemberDeclaration, int typeId) {
+        int annotationMemberModifiers = annotationMemberDeclaration.getModifiers();
+        methodDao.save(new Method(annotationMemberDeclaration.getName(),
+                isPublic(annotationMemberModifiers), isStatic(annotationMemberModifiers), isFinal(annotationMemberModifiers), isAbstract(annotationMemberModifiers), false, typeId));
     }
 
-    private void applyDDL(String schema) throws IOException {
-        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream(schema);
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
-            String line;
-            while((line = bufferedReader.readLine()) != null) {
-                jdbcTemplate.update(line);
-            }
-        }
-    }
 }

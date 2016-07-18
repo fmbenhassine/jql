@@ -32,10 +32,12 @@ public class FieldDao extends BaseDao {
         super(jdbcTemplate);
     }
 
-    public void save(Field field) {
+    public int save(Field field) {
+        int fieldId = getNextId("FIELD");
         jdbcTemplate.update("insert into FIELD values (?,?,?,?,?,?,?,?)",
                 field.getId(), field.getName(), field.getType(),
                 toSqliteBoolean(field.isPublic()), toSqliteBoolean(field.isStatic()), toSqliteBoolean(field.isFinal()), toSqliteBoolean(field.isTransient()), field.getTypeId());
+        return fieldId;
     }
 
 }

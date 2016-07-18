@@ -23,41 +23,18 @@
  */
 package io.github.benas.jcql.core;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import io.github.benas.jcql.domain.ParameterDao;
 
-import javax.sql.DataSource;
-import java.io.*;
+public class ParameterIndexer {
 
-import static io.github.benas.jcql.Utils.getDataSourceFrom;
-import static io.github.benas.jcql.Utils.getDatabasePath;
-import static org.apache.commons.io.FileUtils.*;
+    private ParameterDao parameterDao;
 
-public class DatabaseInitializer {
-
-    private File databaseDirectory;
-
-    private JdbcTemplate jdbcTemplate;
-
-    public DatabaseInitializer(File databaseDirectory) {
-        this.databaseDirectory = databaseDirectory;
-        DataSource dataSource = getDataSourceFrom(databaseDirectory);
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    public ParameterIndexer(ParameterDao parameterDao) {
+        this.parameterDao = parameterDao;
     }
 
-    public void initDatabase() throws IOException {
-        File database = getFile(getDatabasePath(databaseDirectory));
-        deleteQuietly(database);
-        touch(database);
-        applyDDL("database.sql");
-    }
-
-    private void applyDDL(String schema) throws IOException {
-        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream(schema);
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
-            String line;
-            while((line = bufferedReader.readLine()) != null) {
-                jdbcTemplate.update(line);
-            }
-        }
+    public void index(com.github.javaparser.ast.body.Parameter parameter, int methodId) {
+        io.github.benas.jcql.model.Parameter p = new io.github.benas.jcql.model.Parameter(parameter.getId().getName(), parameter.getType().toString(), methodId);
+        parameterDao.save(p);
     }
 }

@@ -23,41 +23,36 @@
  */
 package io.github.benas.jcql.core;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.ast.CompilationUnit;
 
-import javax.sql.DataSource;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 
-import static io.github.benas.jcql.Utils.getDataSourceFrom;
-import static io.github.benas.jcql.Utils.getDatabasePath;
-import static org.apache.commons.io.FileUtils.*;
+import static com.github.javaparser.JavaParser.parse;
+import static io.github.benas.jcql.Utils.getPercent;
 
-public class DatabaseInitializer {
+public class FileIndexer {
 
-    private File databaseDirectory;
+    private CompilationUnitIndexer compilationUnitIndexer;
 
-    private JdbcTemplate jdbcTemplate;
-
-    public DatabaseInitializer(File databaseDirectory) {
-        this.databaseDirectory = databaseDirectory;
-        DataSource dataSource = getDataSourceFrom(databaseDirectory);
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    public FileIndexer(CompilationUnitIndexer compilationUnitIndexer) {
+        this.compilationUnitIndexer = compilationUnitIndexer;
     }
 
-    public void initDatabase() throws IOException {
-        File database = getFile(getDatabasePath(databaseDirectory));
-        deleteQuietly(database);
-        touch(database);
-        applyDDL("database.sql");
-    }
-
-    private void applyDDL(String schema) throws IOException {
-        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream(schema);
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
-            String line;
-            while((line = bufferedReader.readLine()) != null) {
-                jdbcTemplate.update(line);
+    public void indexFiles(Collection<File> files) {
+        int totalFiles = files.size();
+        int fileIndex = 1;
+        for (File file : files) {
+            try {
+                CompilationUnit cu = parse(file);
+                compilationUnitIndexer.index(cu, file.getName());
+            } catch (ParseException | IOException e) {
+                System.err.println("Error while parsing " + file.getAbsolutePath());
             }
+            System.out.print("\rIndexing files: " + getPercent(fileIndex, totalFiles) + "% " + ("(" + fileIndex + "/" + totalFiles + ")"));
+            fileIndex++;
         }
     }
 }

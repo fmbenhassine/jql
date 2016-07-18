@@ -31,6 +31,11 @@ public class CompilationUnit {
 
     private String packageDeclaration;
 
+    public CompilationUnit(String fileName, String packageDeclaration) {
+        this.fileName = fileName;
+        this.packageDeclaration = packageDeclaration;
+    }
+
     public CompilationUnit(int id, String fileName, String packageDeclaration) {
         this.id = id;
         this.fileName = fileName;

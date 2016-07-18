@@ -23,41 +23,30 @@
  */
 package io.github.benas.jcql.core;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import io.github.benas.jcql.domain.CompilationUnitDao;
 
-import javax.sql.DataSource;
-import java.io.*;
+import java.util.List;
 
-import static io.github.benas.jcql.Utils.getDataSourceFrom;
-import static io.github.benas.jcql.Utils.getDatabasePath;
-import static org.apache.commons.io.FileUtils.*;
+public class CompilationUnitIndexer {
 
-public class DatabaseInitializer {
+    private TypeIndexer typeIndexer;
 
-    private File databaseDirectory;
+    private CompilationUnitDao compilationUnitDao;
 
-    private JdbcTemplate jdbcTemplate;
-
-    public DatabaseInitializer(File databaseDirectory) {
-        this.databaseDirectory = databaseDirectory;
-        DataSource dataSource = getDataSourceFrom(databaseDirectory);
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    public CompilationUnitIndexer(CompilationUnitDao compilationUnitDao, TypeIndexer typeIndexer) {
+        this.compilationUnitDao = compilationUnitDao;
+        this.typeIndexer = typeIndexer;
     }
 
-    public void initDatabase() throws IOException {
-        File database = getFile(getDatabasePath(databaseDirectory));
-        deleteQuietly(database);
-        touch(database);
-        applyDDL("database.sql");
-    }
-
-    private void applyDDL(String schema) throws IOException {
-        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream(schema);
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
-            String line;
-            while((line = bufferedReader.readLine()) != null) {
-                jdbcTemplate.update(line);
-            }
+    public void index(com.github.javaparser.ast.CompilationUnit compilationUnit, String fileName) {
+        String packageName = compilationUnit.getPackage() != null ? compilationUnit.getPackage().getPackageName() : "";
+        io.github.benas.jcql.model.CompilationUnit cu = new io.github.benas.jcql.model.CompilationUnit(fileName, packageName);
+        int cuId =  compilationUnitDao.save(cu);
+        List<TypeDeclaration> types = compilationUnit.getTypes();
+        for (TypeDeclaration type : types) {
+            typeIndexer.index(type, cuId);
         }
     }
+
 }

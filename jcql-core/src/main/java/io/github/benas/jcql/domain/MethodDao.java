@@ -32,14 +32,16 @@ public class MethodDao extends BaseDao {
         super(jdbcTemplate);
     }
 
-    public void save(Method method) {
-        jdbcTemplate.update("insert into METHOD values (?,?,?,?,?,?,?,?)", method.getId(), method.getName(),
+    public int save(Method method) {
+        int id = getNextId("METHOD");
+        jdbcTemplate.update("insert into METHOD values (?,?,?,?,?,?,?,?)", id, method.getName(),
                 toSqliteBoolean(method.isPublic()),
                 toSqliteBoolean(method.isStatic()),
                 toSqliteBoolean(method.isFinal()),
                 toSqliteBoolean(method.isAbstract()),
                 toSqliteBoolean(method.isConstructor()),
                 method.getTypeId());
+        return id;
     }
 
 }

@@ -33,6 +33,11 @@ public abstract class BaseDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    protected int getNextId(String table) {
+        Integer count = jdbcTemplate.queryForObject("select count(*) from " + table, Integer.class);
+        return count == 0 ? 1 : jdbcTemplate.queryForObject("select MAX(ID) + 1 from " + table, Integer.class);
+    }
+
     // SQLITE 3 does not support boolean type..
     protected int toSqliteBoolean(boolean bool) {
         return bool ? 1 : 0;

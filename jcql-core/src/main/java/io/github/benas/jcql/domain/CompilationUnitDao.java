@@ -32,8 +32,10 @@ public class CompilationUnitDao extends BaseDao {
         super(jdbcTemplate);
     }
 
-    public void save(CompilationUnit compilationUnit) {
-        jdbcTemplate.update("insert into COMPILATION_UNIT values (?,?,?)", compilationUnit.getId(), compilationUnit.getFileName(), compilationUnit.getPackageDeclaration());
+    public int save(CompilationUnit compilationUnit) {
+        int id = getNextId("COMPILATION_UNIT");
+        jdbcTemplate.update("insert into COMPILATION_UNIT values (?,?,?)", id, compilationUnit.getFileName(), compilationUnit.getPackageDeclaration());
+        return id;
     }
 
 }

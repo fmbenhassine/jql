@@ -23,41 +23,31 @@
  */
 package io.github.benas.jcql.core;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import io.github.benas.jcql.domain.FieldDao;
+import io.github.benas.jcql.model.Field;
 
-import javax.sql.DataSource;
-import java.io.*;
+import java.util.List;
 
-import static io.github.benas.jcql.Utils.getDataSourceFrom;
-import static io.github.benas.jcql.Utils.getDatabasePath;
-import static org.apache.commons.io.FileUtils.*;
+import static java.lang.reflect.Modifier.*;
 
-public class DatabaseInitializer {
+    public class FieldIndexer {
 
-    private File databaseDirectory;
+    private FieldDao fieldDao;
 
-    private JdbcTemplate jdbcTemplate;
-
-    public DatabaseInitializer(File databaseDirectory) {
-        this.databaseDirectory = databaseDirectory;
-        DataSource dataSource = getDataSourceFrom(databaseDirectory);
-        jdbcTemplate = new JdbcTemplate(dataSource);
+    public FieldIndexer(FieldDao fieldDao) {
+        this.fieldDao = fieldDao;
     }
 
-    public void initDatabase() throws IOException {
-        File database = getFile(getDatabasePath(databaseDirectory));
-        deleteQuietly(database);
-        touch(database);
-        applyDDL("database.sql");
-    }
-
-    private void applyDDL(String schema) throws IOException {
-        InputStream databaseSchema = Indexer.class.getClassLoader().getResourceAsStream(schema);
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(databaseSchema))) {
-            String line;
-            while((line = bufferedReader.readLine()) != null) {
-                jdbcTemplate.update(line);
-            }
+    public void index(FieldDeclaration fieldDeclaration, int typeId) {
+        int fieldModifiers = fieldDeclaration.getModifiers();
+        List<VariableDeclarator> variables = fieldDeclaration.getVariables();
+        for (VariableDeclarator variable : variables) {
+            String name = variable.getId().getName();
+            fieldDao.save(new Field(name, fieldDeclaration.getType().toString(),
+                    isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeId));
         }
     }
+
 }

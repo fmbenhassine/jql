@@ -33,6 +33,12 @@ public class Parameter {
 
     private int methodId;
 
+    public Parameter(String name, String type, int methodId) {
+        this.name = name;
+        this.type = type;
+        this.methodId = methodId;
+    }
+
     public Parameter(int id, String name, String type, int methodId) {
         this.id = id;
         this.name = name;

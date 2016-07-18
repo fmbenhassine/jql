@@ -33,7 +33,8 @@ public class ParameterDao extends BaseDao {
     }
 
     public void save(Parameter parameter) {
-        jdbcTemplate.update("insert into PARAMETER values (?,?,?,?)", parameter.getId(), parameter.getName(), parameter.getType(), parameter.getMethodId());
+        int id = getNextId("PARAMETER");
+        jdbcTemplate.update("insert into PARAMETER values (?,?,?,?)", id, parameter.getName(), parameter.getType(), parameter.getMethodId());
     }
 
 }

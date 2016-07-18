@@ -32,8 +32,9 @@ public class TypeDao extends BaseDao {
         super(jdbcTemplate);
     }
 
-    public void save(Type type) {
-        jdbcTemplate.update("insert into TYPE values (?,?,?,?,?,?,?,?,?,?,?)", type.getId(), type.getName(),
+    public int save(Type type) {
+        int typeId = getNextId("TYPE");
+        jdbcTemplate.update("insert into TYPE values (?,?,?,?,?,?,?,?,?,?,?)", typeId, type.getName(),
                 toSqliteBoolean(type.isPublic()),
                 toSqliteBoolean(type.isStatic()),
                 toSqliteBoolean(type.isFinal()),
@@ -43,26 +44,19 @@ public class TypeDao extends BaseDao {
                 toSqliteBoolean(type.isEnumeration()),
                 toSqliteBoolean(type.isAnnotation()),
                 type.getCompilationUnitId());
+        return typeId;
     }
 
-    public int countClass(String name, String packageName) {
-        return jdbcTemplate.queryForObject("select count(c.id) from class c, compilation_unit cu where c.cu_id = cu.id and c.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
+    public int count(String name, String packageName) {
+        return jdbcTemplate.queryForObject("select count(t.id) from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
     }
 
-    public int getInterfaceId(String name, String packageName) {
-        return jdbcTemplate.queryForObject("select i.id from interface i, compilation_unit cu where i.cu_id = cu.id and i.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
+    public int getId(String name, String packageName) {
+        return jdbcTemplate.queryForObject("select t.id from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
     }
 
-    public int getClassId(String name, String packageName) {
-        return jdbcTemplate.queryForObject("select c.id from class c, compilation_unit cu where c.cu_id = cu.id and c.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
-    }
-
-    public boolean existInterface(String name, String packageName) {
-        return jdbcTemplate.queryForObject("select count(i.id) from interface i, compilation_unit cu where i.cu_id = cu.id and i.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class) == 1;
-    }
-
-    public boolean existClass(String name, String packageName) {
-        return jdbcTemplate.queryForObject("select count(c.id) from class c, compilation_unit cu where c.cu_id = cu.id and c.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class) == 1;
+    public boolean exist(String name, String packageName) {
+        return jdbcTemplate.queryForObject("select count(t.id) from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class) == 1;
     }
 
 }

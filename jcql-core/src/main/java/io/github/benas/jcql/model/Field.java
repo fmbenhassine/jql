@@ -31,6 +31,16 @@ public class Field {
 
     private boolean isPublic, isStatic, isFinal, isTransient;
 
+    public Field(String name, String type, boolean isPublic, boolean isStatic, boolean isFinal, boolean isTransient, int typeId) {
+        this.name = name;
+        this.type = type;
+        this.isPublic = isPublic;
+        this.isStatic = isStatic;
+        this.isFinal = isFinal;
+        this.isTransient = isTransient;
+        this.typeId = typeId;
+    }
+
     public Field(int id, String name, String type, boolean isPublic, boolean isStatic, boolean isFinal, boolean isTransient, int typeId) {
         this.id = id;
         this.name = name;
