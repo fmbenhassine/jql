@@ -23,14 +23,25 @@
  */
 package io.github.benas.jcql.domain;
 
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.sql.Connection;
 
 public abstract class BaseDao {
 
     protected JdbcTemplate jdbcTemplate;
 
+    protected DSLContext create;
+
     protected BaseDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public BaseDao(Connection connection) {
+        this.create = DSL.using(connection, SQLDialect.SQLITE);
     }
 
     protected int getNextId(String table) {

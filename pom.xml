@@ -18,6 +18,7 @@
         <junit.version>4.12</junit.version>
         <assertj.version>3.5.1</assertj.version>
         <spring-jdbc.version>4.3.1.RELEASE</spring-jdbc.version>
+        <jooq.version>3.8.4</jooq.version>
         <mockito-core.version>1.10.19</mockito-core.version>
         <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>

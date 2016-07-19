@@ -25,11 +25,16 @@ package io.github.benas.jcql.domain;
 
 import io.github.benas.jcql.model.Type;
 import org.springframework.jdbc.core.JdbcTemplate;
+import java.sql.Connection;
 
 public class TypeDao extends BaseDao {
 
     public TypeDao(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
+    }
+
+    public TypeDao(Connection connection) {
+        super(connection);
     }
 
     public int save(Type type) {
@@ -48,15 +53,16 @@ public class TypeDao extends BaseDao {
     }
 
     public int count(String name, String packageName) {
-        return jdbcTemplate.queryForObject("select count(t.id) from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
+        return create.fetch("select count(t.id) from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", name, packageName).size();
     }
 
     public int getId(String name, String packageName) {
-        return jdbcTemplate.queryForObject("select t.id from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class);
+        return (int) create.fetchOne("select t.id from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", name, packageName).get(0);
     }
 
     public boolean exist(String name, String packageName) {
-        return jdbcTemplate.queryForObject("select count(t.id) from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", new Object[]{name, packageName}, Integer.class) == 1;
+        // should use create.fetchExists
+        return create.fetch("select count(t.id) from type t, compilation_unit cu where t.cu_id = cu.id and t.name = ? and cu.package = ?", name, packageName).size() == 1;
     }
 
 }

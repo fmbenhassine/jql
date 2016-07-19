@@ -26,10 +26,20 @@ package io.github.benas.jcql;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 import static java.lang.System.getProperty;
 
 public class Utils {
+
+    static {
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Unable to load Sqlite JDBC driver");
+        }
+    }
 
     public static SingleConnectionDataSource getDataSourceFrom(String databaseFile) {
         SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
@@ -40,6 +50,11 @@ public class Utils {
 
     public static SingleConnectionDataSource getDataSourceFrom(File directory) {
         return getDataSourceFrom(getDatabasePath(directory));
+    }
+
+    public static Connection getConnection(File directory) throws Exception {
+        String url = "jdbc:sqlite:" + getDatabasePath(directory);
+        return DriverManager.getConnection(url);
     }
 
 
