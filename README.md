@@ -27,9 +27,9 @@ Here is a quick overview of the core entities:
 
 There are also two relations that are indexed for the moment:
 
-* EXTENDS: allows to see if a class/interface extends another class/interface
+* `EXTENDS (TYPE_ID, EXTENDED_TYPE_ID)`: allows to see if a class/interface extends another class/interface
 
-* IMPLEMENTS: allows to determine if a class implements one or multiple interfaces
+* `IMPLEMENTS (CLASS_ID, IMPLEMENTED_INTERFACE_ID)`: allows to determine if a class implements one or multiple interfaces
 
 Other relations will be added progressively.
 
