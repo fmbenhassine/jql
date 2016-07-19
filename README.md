@@ -2,12 +2,12 @@
 ![Build Status](https://travis-ci.org/benas/jcql.svg?branch=master)
 ![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)
 
-**Important note: This project is in early stage and not released yet. The project name may change.
+**Important note: This project is in early stage and is not released yet. The project name may change.
  You can still [give it a try](https://github.com/benas/jcql#getting-started) and send us your feedback, you are very welcome!**
 
 # About JCQL
 
-JCQL (Java Code Query Language) makes it possible to query Java source code in plain SQL. This allows you to ask questions like:
+JCQL (Java Code Query Linter) makes it possible to query Java source code in plain SQL. This allows you to ask questions like:
 
 * Is there any class that has no unit tests?
 * What is the longest class name?
