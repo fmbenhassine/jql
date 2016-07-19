@@ -41,11 +41,9 @@ public class JcqlMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     private File databaseDirectory;
 
-    private Indexer indexer = new Indexer(databaseDirectory);
-
     public void execute() throws MojoExecutionException {
         try {
-            indexer.index(sourceCodeDirectory);
+            new Indexer(databaseDirectory).index(sourceCodeDirectory);
             getLog().info("Done.");
         } catch (IOException e) {
             throw new MojoExecutionException("Unable to index jcql database in " + sourceCodeDirectory, e);
