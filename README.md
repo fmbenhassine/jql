@@ -2,6 +2,9 @@
 ![Build Status](https://travis-ci.org/benas/jcql.svg?branch=master)
 ![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)
 
+**Important note: This project is in early stage and not released yet. The project name may change.
+ You can still [give it a try](https://github.com/benas/jcql#getting-started) and send us your feedback, you are very welcome!**
+
 # About JCQL
 
 JCQL (Java Code Query Language) makes it possible to query Java source code in plain SQL. This allows you to ask questions like:
@@ -35,16 +38,32 @@ select NAME, LENGTH(NAME) as length from CLASS order by length desc limit 10
 select NAME, LENGTH(NAME) as length from METHOD order by length desc limit 10
 ```
 
+# Getting started
+
+JCQL tools are in early stage and are not released yet. You can still try the first snapshot version:
+
+* jcql-core: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-core/0.1-SNAPSHOT/jcql-core-0.1-20160719.092316-1.jar)
+* jcql-shell: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-shell/0.1-SNAPSHOT/jcql-shell-0.1-20160719.092346-1.jar)
+
 # Index your code base
 
 JCQL tools provide two ways to create a relational database from a given code base:
 
 #### Using maven
 
-Run the following command in the root folder of the project you want to analyse:
+Add the following repository in your `pom.xml` :
+
+```xml
+<repository>
+    <id>ossrh</id>
+    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+</repository>
+```
+
+and run the following command in the root folder of the project you want to analyse:
 
 ```
-mvn io.github.benas:jcql-maven-plugin:index
+mvn io.github.benas:jcql-maven-plugin:0.1-SNAPSHOT:index
 ```
 
 This will create a file named `jcql.db` in the `target` directory that you can
