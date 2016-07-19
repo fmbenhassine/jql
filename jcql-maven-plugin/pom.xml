@@ -12,6 +12,13 @@
     <artifactId>jcql-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
+    <scm>
+        <url>git@github.com:benas/jcql.git</url>
+        <connection>scm:git:git@github.com:benas/jcql.git</connection>
+        <developerConnection>scm:git:git@github.com:benas/jcql.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>io.github.benas</groupId>

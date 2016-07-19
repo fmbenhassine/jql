@@ -11,6 +11,13 @@
 
     <artifactId>jcql-core</artifactId>
 
+    <scm>
+        <url>git@github.com:benas/jcql.git</url>
+        <connection>scm:git:git@github.com:benas/jcql.git</connection>
+        <developerConnection>scm:git:git@github.com:benas/jcql.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>com.github.javaparser</groupId>
