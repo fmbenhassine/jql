@@ -2,8 +2,9 @@
 ![Build Status](https://travis-ci.org/benas/jcql.svg?branch=master)
 ![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)
 
-**Important note: This project is in early stage and is not released yet. The project name may change.
- You can still [give it a try](https://github.com/benas/jcql#getting-started) and send us your feedback, you are very welcome!**
+**Important note: This project is in early stage. It's just a PoC published for evaluation with the help of the community.
+If the idea is successful, the project may be renamed and the code base will be completely rewritten in a clean way, otherwise this repository will be deleted.
+Even though the project is not released yet, you can still [give it a try](https://github.com/benas/jcql#getting-started) and send us your feedback, you are very welcome!**
 
 # About JCQL
 
