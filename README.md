@@ -21,9 +21,17 @@ JCQL tools can be easily integrated in your build process to continuously check 
 
 JCQL tools create a relational model from a given Java source code base. Once you have created the relational model, you can
 query it with standard SQL. The relational model has been designed to be intuitive, natural and easy to understand and query.
-Here is a quick overview of the core tables:
+Here is a quick overview of the core entities:
 
 ![ER diagram](https://raw.githubusercontent.com/benas/jcql/master/jcql-erd.png)
+
+There are also two relations that are indexed for the moment:
+
+* EXTENDS: allows to see if a class/interface extends another class/interface
+
+* IMPLEMENTS: allows to determine if a class implements one or multiple interfaces
+
+Other relations will be added progressively.
 
 Here are some examples of queries:
 
