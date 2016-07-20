@@ -32,16 +32,35 @@ query it with standard SQL. The relational model has been designed to be intuiti
 
 #### Examples of queries:
 
+###### Find interfaces with more than 20 methods
+
+```sql
+SELECT i.NAME as name, COUNT(m.ID) as nbMethods
+FROM INTERFACE i, METHOD m
+WHERE m.TYPE_ID = i.ID GROUP BY i.ID HAVING COUNT(m.ID) > 20;
+```
+
+###### Find classes with more than 5 constructors
+
+```sql
+SELECT c.NAME as name, COUNT(c.ID) as nbConstructors
+FROM CLASS c, CONSTRUCTOR co
+WHERE co.TYPE_ID = c.ID GROUP BY c.NAME HAVING COUNT(c.ID) > 5;
+```
+
+###### Find methods with more than 5 parameters
+
+```sql
+SELECT t.NAME as typeName, m.NAME as methodName, COUNT(m.ID) as nbParams
+FROM TYPE t, METHOD m, PARAMETER p
+WHERE p.METHOD_ID = m.ID and m.TYPE_ID = t.ID
+GROUP BY m.ID HAVING COUNT(m.ID) > 5;
+```
+
 ###### Find the top 10 longest class names:
 
 ```sql
-select NAME, LENGTH(NAME) as length from CLASS order by length desc limit 10
-```
-
-###### Find the top 10 longest method names:
-
-```sql
-select NAME, LENGTH(NAME) as length from METHOD order by length desc limit 10
+SELECT name, LENGTH(name) as length from CLASS ORDER BY length DESC LIMIT 10;
 ```
 
 # Getting started
