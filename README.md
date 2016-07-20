@@ -70,7 +70,7 @@ JCQL is in early stage and is not released yet. You can still try the first snap
 * jcql-core: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-core/0.1-SNAPSHOT/jcql-core-0.1-20160719.092316-1.jar)
 * jcql-shell: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-shell/0.1-SNAPSHOT/jcql-shell-0.1-20160719.092346-1.jar)
 
-**Note: JCQL require Java 1.8+**
+**Note: JCQL requires Java 1.8+**
 
 # Index your code base
 
