@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.github.javaparser.JavaParser.parse;
+import static io.github.benas.jcql.Utils.getPercent;
 
 public class RelationCalculator {
 
@@ -49,7 +50,8 @@ public class RelationCalculator {
 
     public void calculateRelations(Collection<File> files) {
         System.out.println();
-        System.out.println("Calculating relations..");
+        int totalFiles = files.size();
+        int fileIndex = 1;
         for (File file : files) {
             try {
                 CompilationUnit cu = parse(file);
@@ -75,6 +77,8 @@ public class RelationCalculator {
             } catch (ParseException | IOException e) {
                 System.err.println("Error while parsing " + file.getAbsolutePath());
             }
+            System.out.print("\rCalculating relations: " + getPercent(fileIndex, totalFiles) + "% " + ("(" + fileIndex + "/" + totalFiles + ")"));
+            fileIndex++;
         }
         System.out.println();
     }
