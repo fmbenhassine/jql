@@ -2,38 +2,35 @@
 ![Build Status](https://travis-ci.org/benas/jcql.svg?branch=master)
 ![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)
 
-**Important note: This project is in early stage. It's just a PoC published for evaluation with the help of the community.
-If the idea is successful, the project may be renamed and the code base will be completely rewritten in a clean way, otherwise this repository will be deleted.
+**Important note: This project is in early stage. It's a PoC published for evaluation purpose with your help!
+If the idea is successful, the project may be renamed and the code base will be completely rewritten, otherwise this repository will be deleted.
 Even though the project is not released yet, you can still [give it a try](https://github.com/benas/jcql#getting-started) and send us your feedback, you are very welcome!**
 
 # About JCQL
 
-JCQL (Java Code Query Linter) makes it possible to query Java source code in plain SQL. This allows you to ask questions like:
+JCQL (Java Code Query Linter) makes it possible to query Java source code with SQL. This allows you to answer questions like:
 
 * Is there any class that has no unit tests?
 * What is the longest class name?
 * Is there any class that has more than 20 methods?
 
-This kind of static analysis gives you precious insights in order to improve the quality of your code base.
-JCQL tools can be easily integrated in your build process to continuously check if your coding rules are respected.
+It is a static analysis tool that gives you precious insights on your code base in order to improve its quality.
+JCQL can be easily integrated in your build process to continuously check if your coding rules are respected.
 
-# How does it work
+# How it works?
 
-JCQL tools create a relational model from a given Java source code base. Once you have created the relational model, you can
-query it with standard SQL. The relational model has been designed to be intuitive, natural and easy to understand and query.
-Here is a quick overview of the core entities:
+JCQL creates a relational database from a given Java code base. Once you have created the relational model, you can
+query it with standard SQL. The relational model has been designed to be intuitive, natural and easy to understand and query:
 
-![ER diagram](https://raw.githubusercontent.com/benas/jcql/master/jcql-erd.png)
+#### Entities:
 
-There are also two relations that are indexed for the moment:
+![EDiagram](https://raw.githubusercontent.com/benas/jcql/master/jcql-ed.png)
 
-* `EXTENDS (TYPE_ID, EXTENDED_TYPE_ID)`: allows to see if a class/interface extends another class/interface
+#### Relations:
 
-* `IMPLEMENTS (CLASS_ID, IMPLEMENTED_INTERFACE_ID)`: allows to determine if a class implements one or multiple interfaces
+![RDiagram](https://raw.githubusercontent.com/benas/jcql/master/jcql-rd.png)
 
-Other relations will be added progressively.
-
-Here are some examples of queries:
+#### Examples of queries:
 
 ###### Find the top 10 longest class names:
 
@@ -49,16 +46,16 @@ select NAME, LENGTH(NAME) as length from METHOD order by length desc limit 10
 
 # Getting started
 
-JCQL tools are in early stage and are not released yet. You can still try the first snapshot version:
+JCQL is in early stage and is not released yet. You can still try the first snapshot version:
 
 * jcql-core: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-core/0.1-SNAPSHOT/jcql-core-0.1-20160719.092316-1.jar)
 * jcql-shell: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-shell/0.1-SNAPSHOT/jcql-shell-0.1-20160719.092346-1.jar)
 
-**Note: JCQL tools require Java 1.8+**
+**Note: JCQL require Java 1.8+**
 
 # Index your code base
 
-JCQL tools provide two ways to create a relational database from a given code base:
+JCQL provides two ways to create a relational database from a given Java code base:
 
 #### Using maven
 
@@ -78,7 +75,7 @@ mvn io.github.benas:jcql-maven-plugin:0.1-SNAPSHOT:index
 ```
 
 This will create a file named `jcql.db` in the `target` directory that you can
-query with your favorite SQL client or the one provided by JCQL tools
+query with your favorite SQL client or the one provided by JCQL.
 
 #### Using java
 
@@ -94,7 +91,7 @@ Once you have indexed your Java code in a relational format, you can query it wi
 
 #### Using a SQL client
 
-Just open the `jcql.db` file with your favorite SQL client and start writing queries. You can use [Sqlite tools](https://www.sqlite.org/download.html) or [Sqlite browser](http://sqlitebrowser.org/).
+Open the `jcql.db` file with your favorite SQL client and start writing queries. For example, you can use [Sqlite tools](https://www.sqlite.org/download.html) or [Sqlite browser](http://sqlitebrowser.org/).
 
 #### Using JCQL Shell
 
