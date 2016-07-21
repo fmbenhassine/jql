@@ -42,10 +42,12 @@ public class RelationCalculator {
 
     private ExtendsRelationCalculator extendsRelationCalculator;
     private ImplementsRelationCalculator implementsRelationCalculator;
+    private AnnotatedWithCalculator annotatedWithCalculator;
 
-    public RelationCalculator(ExtendsRelationCalculator extendsRelationCalculator, ImplementsRelationCalculator implementsRelationCalculator) {
+    public RelationCalculator(ExtendsRelationCalculator extendsRelationCalculator, ImplementsRelationCalculator implementsRelationCalculator, AnnotatedWithCalculator annotatedWithCalculator) {
         this.extendsRelationCalculator = extendsRelationCalculator;
         this.implementsRelationCalculator = implementsRelationCalculator;
+        this.annotatedWithCalculator = annotatedWithCalculator;
     }
 
     public void calculateRelations(Collection<File> files) {
@@ -72,6 +74,9 @@ public class RelationCalculator {
                         implementsRelationCalculator.calculate(classDeclaration, cu);
                         // check if this class extends another class and persist relation in EXTENDS table
                         extendsRelationCalculator.calculate(classDeclaration, cu);
+                    }
+                    if (isClass || isInterface) {
+                        annotatedWithCalculator.calculate((ClassOrInterfaceDeclaration) type, cu);
                     }
                 }
             } catch (ParseException | IOException e) {

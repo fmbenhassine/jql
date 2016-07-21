@@ -50,7 +50,11 @@ public class Indexer {
         CompilationUnitIndexer compilationUnitIndexer = getCompilationUnitIndexer(jdbcTemplate);
         fileIndexer = new FileIndexer(compilationUnitIndexer);
         TypeDao typeDao = new TypeDao(jdbcTemplate);
-        relationCalculator = new RelationCalculator(new ExtendsRelationCalculator(typeDao, new ExtendsDao(jdbcTemplate)), new ImplementsRelationCalculator(typeDao, new ImplementsDao(jdbcTemplate)));
+        relationCalculator = new RelationCalculator(
+                new ExtendsRelationCalculator(typeDao, new ExtendsDao(jdbcTemplate)),
+                new ImplementsRelationCalculator(typeDao, new ImplementsDao(jdbcTemplate)),
+                new AnnotatedWithCalculator(typeDao, new AnnotatedWithDao(jdbcTemplate))
+                );
     }
 
     public void index(File sourceCodeDirectory) throws IOException {

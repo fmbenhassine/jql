@@ -62,6 +62,7 @@ public class IndexerTest {
         assertThat(count("parameter")).isEqualTo(2);
         assertThat(count("implements")).isEqualTo(2);
         assertThat(count("extends")).isEqualTo(1);
+        assertThat(count("annotated_with")).isEqualTo(1);
         assertThat(count("compilation_unit")).isEqualTo(7);
     }
 
