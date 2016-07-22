@@ -4,7 +4,7 @@
 
 **Important note: This project is in early stage. It's a PoC published for evaluation purpose with your help!
 If the idea is successful, the project may be renamed and the code base will be completely rewritten, otherwise this repository will be deleted.
-Even though the project is not released yet, you can still [give it a try](https://github.com/benas/jql#getting-started) and send us your feedback, you are very welcome!**
+Please [give it a try](https://github.com/benas/jql#getting-started) and send us your feedback, we would love to hear your thoughts!**
 
 # About JQL
 
@@ -21,15 +21,15 @@ This repository provides a static analysis tool that gives you precious insights
 JQL engine creates a relational database from a Java code base. Once you have created the relational database, you can
 query it with standard SQL. The relational model has been designed to be intuitive, natural and easy to understand and query:
 
-#### Entities:
+### Entities:
 
 ![EDiagram](https://raw.githubusercontent.com/benas/jql/master/jql-ed.png)
 
-#### Relations:
+### Relations:
 
 ![RDiagram](https://raw.githubusercontent.com/benas/jql/master/jql-rd.png)
 
-#### Examples of queries:
+### Examples of queries:
 
 ###### Find interfaces with more than 20 methods
 
@@ -64,10 +64,10 @@ SELECT name, LENGTH(name) as length from CLASS ORDER BY length DESC LIMIT 10;
 
 # Getting started
 
-JQL is in early stage and is not released yet. You can still try the first snapshot version:
+JQL tools are distributed in executable jars:
 
-* jql-core: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-core/0.1-SNAPSHOT/jcql-core-0.1-20160719.092316-1.jar)
-* jql-shell: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-shell/0.1-SNAPSHOT/jcql-shell-0.1-20160719.092346-1.jar)
+* jql-core: [download jar](https://oss.sonatype.org/content/groups/public/io/github/benas/jql-core/0.1/jql-core-0.1.jar)
+* jql-shell: [download jar](https://oss.sonatype.org/content/groups/public/io/github/benas/jql-shell/0.1/jql-shell-0.1.jar)
 
 **Note: JQL tools require Java 1.8+**
 
@@ -77,19 +77,10 @@ There are two ways to create a relational database from a Java code base:
 
 #### Using maven
 
-Add the following repository in your `pom.xml` :
-
-```xml
-<repository>
-    <id>ossrh</id>
-    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-</repository>
-```
-
-and run the following command in the root folder of the project you want to analyse:
+Run the following command in the root folder of the project you want to analyse:
 
 ```
-mvn io.github.benas:jql-maven-plugin:0.1-SNAPSHOT:index
+mvn io.github.benas:jql-maven-plugin:index
 ```
 
 This will create a file named `jql.db` in the `target` directory that you can
@@ -123,6 +114,6 @@ java -jar /path/to/jql-shell-{latest-version}.jar /path/to/jql.db
 
 # Credits
 
-* JQL tools use the great [JavaParser](https://github.com/javaparser/javaparser) library to parse Java code and transform it a relational model.
+* JQL tools use [JavaParser](https://github.com/javaparser/javaparser) to parse Java code and transform it a relational model.
 
 * JLQ tools use [Sqlite](https://www.sqlite.org) to store Java code in a relational database.
