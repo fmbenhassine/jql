@@ -3,7 +3,7 @@
     <parent>
         <artifactId>jql</artifactId>
         <groupId>io.github.benas</groupId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
         <url>git@github.com:benas/jql.git</url>
         <connection>scm:git:git@github.com:benas/jql.git</connection>
         <developerConnection>scm:git:git@github.com:benas/jql.git</developerConnection>
-        <tag>jql-0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
