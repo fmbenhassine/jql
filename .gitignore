@@ -16,5 +16,5 @@
 log/
 target/
 
-jcql-core/dependency-reduced-pom.xml
-jcql-shell/dependency-reduced-pom.xml
+jql-core/dependency-reduced-pom.xml
+jql-shell/dependency-reduced-pom.xml

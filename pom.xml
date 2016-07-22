@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>io.github.benas</groupId>
-    <artifactId>jcql</artifactId>
+    <artifactId>jql</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -33,15 +33,15 @@
     </properties>
 
     <modules>
-        <module>jcql-core</module>
-        <module>jcql-maven-plugin</module>
-        <module>jcql-shell</module>
+        <module>jql-core</module>
+        <module>jql-maven-plugin</module>
+        <module>jql-shell</module>
     </modules>
 
     <scm>
-        <url>git@github.com:benas/jcql.git</url>
-        <connection>scm:git:git@github.com:benas/jcql.git</connection>
-        <developerConnection>scm:git:git@github.com:benas/jcql.git</developerConnection>
+        <url>git@github.com:benas/jql.git</url>
+        <connection>scm:git:git@github.com:benas/jql.git</connection>
+        <developerConnection>scm:git:git@github.com:benas/jql.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 

@@ -1,34 +1,33 @@
 ![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)
-![Build Status](https://travis-ci.org/benas/jcql.svg?branch=master)
+![Build Status](https://travis-ci.org/benas/jql.svg?branch=master)
 ![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)
 
 **Important note: This project is in early stage. It's a PoC published for evaluation purpose with your help!
 If the idea is successful, the project may be renamed and the code base will be completely rewritten, otherwise this repository will be deleted.
-Even though the project is not released yet, you can still [give it a try](https://github.com/benas/jcql#getting-started) and send us your feedback, you are very welcome!**
+Even though the project is not released yet, you can still [give it a try](https://github.com/benas/jql#getting-started) and send us your feedback, you are very welcome!**
 
-# About JCQL
+# About JQL
 
-JCQL (Java Code Query Linter) makes it possible to query Java source code with SQL. This allows you to answer questions like:
+JQL (Java Query Language) makes it possible to query Java source code with SQL. This allows you to answer questions like:
 
 * Is there any class that has no unit tests?
 * What is the longest class name?
-* Is there any class that has more than 20 methods?
+* Is there an interface with more than 20 methods?
 
-It is a static analysis tool that gives you precious insights on your code base in order to improve its quality.
-JCQL can be easily integrated in your build process to continuously check if your coding rules are respected.
+This repository provides a static analysis tool that gives you precious insights on your code base in order to improve its quality.
 
-# How it works?
+# How does it work?
 
-JCQL creates a relational database from a given Java code base. Once you have created the relational model, you can
+JQL engine creates a relational database from a Java code base. Once you have created the relational database, you can
 query it with standard SQL. The relational model has been designed to be intuitive, natural and easy to understand and query:
 
 #### Entities:
 
-![EDiagram](https://raw.githubusercontent.com/benas/jcql/master/jcql-ed.png)
+![EDiagram](https://raw.githubusercontent.com/benas/jql/master/jql-ed.png)
 
 #### Relations:
 
-![RDiagram](https://raw.githubusercontent.com/benas/jcql/master/jcql-rd.png)
+![RDiagram](https://raw.githubusercontent.com/benas/jql/master/jql-rd.png)
 
 #### Examples of queries:
 
@@ -65,16 +64,16 @@ SELECT name, LENGTH(name) as length from CLASS ORDER BY length DESC LIMIT 10;
 
 # Getting started
 
-JCQL is in early stage and is not released yet. You can still try the first snapshot version:
+JQL is in early stage and is not released yet. You can still try the first snapshot version:
 
-* jcql-core: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-core/0.1-SNAPSHOT/jcql-core-0.1-20160719.092316-1.jar)
-* jcql-shell: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-shell/0.1-SNAPSHOT/jcql-shell-0.1-20160719.092346-1.jar)
+* jql-core: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-core/0.1-SNAPSHOT/jcql-core-0.1-20160719.092316-1.jar)
+* jql-shell: [download jar](https://oss.sonatype.org/content/repositories/snapshots/io/github/benas/jcql-shell/0.1-SNAPSHOT/jcql-shell-0.1-20160719.092346-1.jar)
 
-**Note: JCQL requires Java 1.8+**
+**Note: JQL tools require Java 1.8+**
 
 # Index your code base
 
-JCQL provides two ways to create a relational database from a given Java code base:
+There are two ways to create a relational database from a Java code base:
 
 #### Using maven
 
@@ -90,18 +89,18 @@ Add the following repository in your `pom.xml` :
 and run the following command in the root folder of the project you want to analyse:
 
 ```
-mvn io.github.benas:jcql-maven-plugin:0.1-SNAPSHOT:index
+mvn io.github.benas:jql-maven-plugin:0.1-SNAPSHOT:index
 ```
 
-This will create a file named `jcql.db` in the `target` directory that you can
-query with your favorite SQL client or the one provided by JCQL.
+This will create a file named `jql.db` in the `target` directory that you can
+query with your favorite SQL client or the provided [JQL shell](https://github.com/benas/jql#using-jql-shell).
 
 #### Using java
 
 Run the following command:
 
 ```
-java -jar jcql-core-{latest-version}.jar /path/to/project/to/analyse /path/to/database/directory
+java -jar jql-core-{latest-version}.jar /path/to/project/to/analyse /path/to/database/directory
 ```
 
 # Query your Java code with SQL
@@ -110,20 +109,20 @@ Once you have indexed your Java code in a relational format, you can query it wi
 
 #### Using a SQL client
 
-Open the `jcql.db` file with your favorite SQL client and start writing queries. For example, you can use [Sqlite tools](https://www.sqlite.org/download.html) or [Sqlite browser](http://sqlitebrowser.org/).
+Open the `jql.db` file with your favorite SQL client and start writing queries. For example, you can use [Sqlite tools](https://www.sqlite.org/download.html) or [Sqlite browser](http://sqlitebrowser.org/).
 
-#### Using JCQL Shell
+#### Using JQL Shell
 
-The JCQL shell is a command line tool that allows you to write queries against the generated database.
+JQL shell is a command line tool that allows you to write queries against the generated database.
 
 You can start it as follows:
 
 ```
-java -jar /path/to/jcql-shell-{latest-version}.jar /path/to/jcql.db
+java -jar /path/to/jql-shell-{latest-version}.jar /path/to/jql.db
 ```
 
 # Credits
 
-* JCQL tools use the great [java-parser](https://github.com/javaparser/javaparser) library to parse Java code and transform it a relational model.
+* JQL tools use the great [JavaParser](https://github.com/javaparser/javaparser) library to parse Java code and transform it a relational model.
 
-* JCQL tools use [Sqlite](https://www.sqlite.org) to store and query relational data about Java code
+* JLQ tools use [Sqlite](https://www.sqlite.org) to store Java code in a relational database.
