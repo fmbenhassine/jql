@@ -68,7 +68,8 @@ public class Shell {
             try {
                 System.out.println(queryExecutor.execute(command, resultSetExtractor));
             } catch (DataAccessException e) {
-                System.err.println("Unable to execute query " + command);
+                System.err.println("Unable to execute query: " + command);
+                System.err.println(e.getRootCause().getMessage());
             }
         }
     }
