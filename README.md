@@ -1,9 +1,8 @@
 ![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)
 ![Build Status](https://travis-ci.org/benas/jql.svg?branch=master)
-![Development Stage](https://img.shields.io/badge/development%20stage-alpha-orange.svg)
+![Development Stage](https://img.shields.io/badge/development%20stage-PoC-orange.svg)
 
-**Important note: This project is in early stage. It's a PoC published for evaluation purpose with your help!
-If the idea is successful, the project may be renamed and the code base will be completely rewritten, otherwise this repository will be deleted.
+**Important note: This project is in early stage. It is published for evaluation purpose with your help!
 Please [give it a try](https://github.com/benas/jql#getting-started) and send us your feedback, we would love to hear your thoughts!**
 
 # About JQL
