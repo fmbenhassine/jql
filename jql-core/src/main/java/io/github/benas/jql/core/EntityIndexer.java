@@ -33,11 +33,11 @@ import java.util.Collection;
 import static com.github.javaparser.JavaParser.parse;
 import static io.github.benas.jql.Utils.getPercent;
 
-public class FileIndexer {
+public class EntityIndexer {
 
     private CompilationUnitIndexer compilationUnitIndexer;
 
-    public FileIndexer(CompilationUnitIndexer compilationUnitIndexer) {
+    public EntityIndexer(CompilationUnitIndexer compilationUnitIndexer) {
         this.compilationUnitIndexer = compilationUnitIndexer;
     }
 
@@ -51,7 +51,7 @@ public class FileIndexer {
             } catch (ParseException | IOException e) {
                 System.err.println("Error while parsing " + file.getAbsolutePath());
             }
-            System.out.print("\rIndexing files: " + getPercent(fileIndex, totalFiles) + "% " + ("(" + fileIndex + "/" + totalFiles + ")"));
+            System.out.print("\rIndexing entities: " + getPercent(fileIndex, totalFiles) + "% " + ("(" + fileIndex + "/" + totalFiles + ")"));
             fileIndex++;
         }
     }

@@ -39,7 +39,7 @@ public class Indexer {
 
     private File databaseDirectory;
     private DatabaseInitializer databaseInitializer;
-    private FileIndexer fileIndexer;
+    private EntityIndexer entityIndexer;
     private RelationCalculator relationCalculator;
 
     public Indexer(File databaseDirectory) {
@@ -48,7 +48,7 @@ public class Indexer {
         this.databaseDirectory = databaseDirectory;
         databaseInitializer = new DatabaseInitializer(databaseDirectory);
         CompilationUnitIndexer compilationUnitIndexer = getCompilationUnitIndexer(jdbcTemplate);
-        fileIndexer = new FileIndexer(compilationUnitIndexer);
+        entityIndexer = new EntityIndexer(compilationUnitIndexer);
         TypeDao typeDao = new TypeDao(jdbcTemplate);
         relationCalculator = new RelationCalculator(
                 new ExtendsRelationCalculator(typeDao, new ExtendsDao(jdbcTemplate)),
@@ -58,11 +58,11 @@ public class Indexer {
     }
 
     public void index(File sourceCodeDirectory) throws IOException {
-        System.out.println("Indexing source code in " + sourceCodeDirectory.getAbsolutePath() + " in database " + getDatabasePath(databaseDirectory));
+        System.out.println("Indexing source code in " + sourceCodeDirectory.getAbsolutePath() + " into " + getDatabasePath(databaseDirectory));
         databaseInitializer.initDatabase();
 
         Collection<File> files = listFiles(sourceCodeDirectory, new String[]{"java"}, true);
-        fileIndexer.indexFiles(files);
+        entityIndexer.indexFiles(files);
         relationCalculator.calculateRelations(files);
     }
 
