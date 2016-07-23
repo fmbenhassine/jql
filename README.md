@@ -95,8 +95,9 @@ If you want to contribute, please consider the tool as a black box for now.
 
 Any suggestion or improvement of the relational model is very welcome!
 
-You can try to index a code base and write some queries. If there is a question you cannot answer,
- you have certainly found a way to improve the current model! So please open an issue with your question and this would be a great contribution!
+You can try to index a code base (or [download a pre-indexed database sample](https://github.com/benas/jql/wiki/Samples)) and write some queries.
+ If there is a question you cannot answer, you have certainly found a way to improve the current model!
+ So please open an issue with your question and this would be a great contribution!
 
 # Credits
 
