@@ -18,17 +18,20 @@ This repository provides a static analysis tool that gives you precious insights
 # How does it work?
 
 JQL engine creates a relational database from a Java code base. Once you have created the relational database, you can
-query it with standard SQL. The relational model has been designed to be intuitive, natural and easy to understand and query:
+query it with standard SQL. The relational model has been designed to be intuitive, natural and easy to understand and query.
+Here are the core entities and relations:
 
-### Entities:
+### Entities
 
 ![EDiagram](https://raw.githubusercontent.com/benas/jql/master/jql-ed.png)
 
-### Relations:
+### Relations
 
 ![RDiagram](https://raw.githubusercontent.com/benas/jql/master/jql-rd.png)
 
-### Examples of queries:
+You can find a complete description of the database schema [here](https://github.com/benas/jql/wiki/database-schema).
+
+### Examples of queries
 
 ###### Find interfaces with more than 20 methods
 
@@ -61,58 +64,70 @@ GROUP BY m.ID HAVING COUNT(m.ID) > 5;
 SELECT name, LENGTH(name) as length from CLASS ORDER BY length DESC LIMIT 10;
 ```
 
-# Getting started
+# How to get started ?
 
-JQL tools are distributed in executable jars:
+JQL engine is distributed as a single executable jar that creates a self-contained serverless Sqlite relational database from your Java code base:
 
-* jql-core: [download jar](https://oss.sonatype.org/content/groups/public/io/github/benas/jql-core/0.1/jql-core-0.1.jar)
-* jql-shell: [download jar](https://oss.sonatype.org/content/groups/public/io/github/benas/jql-shell/0.1/jql-shell-0.1.jar)
+```
+java -jar jql-core-0.1.jar /path/to/project/to/analyse /path/to/database/directory
+```
 
-**Note: JQL tools require Java 1.8+**
+This command will index your code and create a file named `jql.db` in the specified directory.
 
-# Index your code base
-
-There are two ways to create a relational database from a Java code base:
-
-#### Using maven
-
-Run the following command in the root folder of the project you want to analyse:
+For maven based projects, just run the following command in the root directory of the project to analyse:
 
 ```
 mvn io.github.benas:jql-maven-plugin:index
 ```
 
-This will create a file named `jql.db` in the `target` directory that you can
-query with your favorite SQL client or the provided [JQL shell](https://github.com/benas/jql#using-jql-shell).
+The `jql.db` file will be created in the `target` directory.
 
-#### Using java
+Once you are done, you can open the `jql.db` file with your favorite SQL client and start writing queries.
 
-Run the following command:
+You can find all details about how to get started [here](https://github.com/benas/jql/wiki/getting-started).
 
-```
-java -jar jql-core-{latest-version}.jar /path/to/project/to/analyse /path/to/database/directory
-```
+# How to contribute?
 
-# Query your Java code with SQL
+Since the project is still a PoC, we are not yet focused on the quality of the code base.
+The main goal for the moment is to see if the relational model is adequate for Java code analysis and linting.
 
-Once you have indexed your Java code in a relational format, you can query it with plain SQL:
+If you want to contribute, please consider the tool as a black box for now.
 
-#### Using a SQL client
+Any suggestion or improvement of the relational model is very welcome!
 
-Open the `jql.db` file with your favorite SQL client and start writing queries. For example, you can use [Sqlite tools](https://www.sqlite.org/download.html) or [Sqlite browser](http://sqlitebrowser.org/).
-
-#### Using JQL Shell
-
-JQL shell is a command line tool that allows you to write queries against the generated database.
-
-You can start it as follows:
-
-```
-java -jar /path/to/jql-shell-{latest-version}.jar /path/to/jql.db
-```
+You can try to index a code base and write some queries. If there is a question you cannot answer,
+ you have certainly found a way to improve the current model! So please open an issue with your question and this would be a great contribution!
 
 # Credits
 
 * JQL tools use [JavaParser](https://github.com/javaparser/javaparser) to parse Java code and transform it a relational model.
 
 * JLQ tools use [Sqlite](https://www.sqlite.org) to store Java code in a relational database.
+
+# License
+
+JQL tools are released under the MIT license:
+
+```
+The MIT License
+
+Copyright (c) 2016, Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
