@@ -3,7 +3,7 @@
 ![Development Stage](https://img.shields.io/badge/development%20stage-PoC-orange.svg)
 
 **Important note: This project is in early stage. It is published for evaluation purpose with your help!
-Please [give it a try](https://github.com/benas/jql#getting-started) and send us your feedback, we would love to hear your thoughts!**
+Please [give it a try](https://github.com/benas/jql#how-to-get-started-) and send us your feedback, we would love to hear your thoughts!**
 
 # About JQL
 
