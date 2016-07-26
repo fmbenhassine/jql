@@ -64,6 +64,8 @@ GROUP BY m.ID HAVING COUNT(m.ID) > 5;
 SELECT name, LENGTH(name) as length from CLASS ORDER BY length DESC LIMIT 10;
 ```
 
+You can find some real world examples on popular open source projects [here](https://github.com/benas/jql/wiki/Samples#examples).
+
 # How to get started ?
 
 JQL engine is distributed as a single executable jar that creates a self-contained serverless Sqlite relational database from your Java code base:
