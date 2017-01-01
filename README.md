@@ -103,9 +103,9 @@ You can try to index a code base (or [download a pre-indexed database sample](ht
 
 # Credits
 
-* JQL tools use [JavaParser](https://github.com/javaparser/javaparser) to parse Java code and transform it a relational model.
+* JQL tools use [JavaParser](https://github.com/javaparser/javaparser) to parse Java code and transform it into a relational model.
 
-* JQL tools use [Sqlite](https://www.sqlite.org) to store Java code in a relational database.
+* JQL tools use [Sqlite](https://www.sqlite.org) to store Java code model in a relational database.
 
 # License
 
