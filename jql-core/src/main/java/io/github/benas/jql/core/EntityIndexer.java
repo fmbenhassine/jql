@@ -24,6 +24,7 @@
 package io.github.benas.jql.core;
 
 import com.github.javaparser.ParseException;
+import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
 
 import java.io.File;
@@ -48,7 +49,7 @@ public class EntityIndexer {
             try {
                 CompilationUnit cu = parse(file);
                 compilationUnitIndexer.index(cu, file.getName());
-            } catch (ParseException | IOException e) {
+            } catch (ParseProblemException | IOException e) {
                 System.err.println("Error while parsing " + file.getAbsolutePath());
             }
             System.out.print("\rIndexing entities: " + getPercent(fileIndex, totalFiles) + "% " + ("(" + fileIndex + "/" + totalFiles + ")"));

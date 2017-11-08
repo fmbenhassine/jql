@@ -24,7 +24,9 @@
 package io.github.benas.jql.core;
 
 import com.github.javaparser.ParseException;
+import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
@@ -57,8 +59,8 @@ public class RelationCalculator {
         for (File file : files) {
             try {
                 CompilationUnit cu = parse(file);
-                List<TypeDeclaration> types = cu.getTypes();
-                for (TypeDeclaration type : types) {
+                NodeList<TypeDeclaration<?>> types = cu.getTypes();
+                for (TypeDeclaration<?> type : types) {
                     boolean isInterface = type instanceof ClassOrInterfaceDeclaration && ((ClassOrInterfaceDeclaration) type).isInterface();
                     boolean isAnnotation = type instanceof AnnotationDeclaration;
                     boolean isEnumeration = type instanceof EnumDeclaration;
@@ -79,7 +81,7 @@ public class RelationCalculator {
                         annotatedWithCalculator.calculate((ClassOrInterfaceDeclaration) type, cu);
                     }
                 }
-            } catch (ParseException | IOException e) {
+            } catch (ParseProblemException | IOException e) {
                 System.err.println("Error while parsing " + file.getAbsolutePath());
             }
             System.out.print("\rCalculating relations: " + getPercent(fileIndex, totalFiles) + "% " + ("(" + fileIndex + "/" + totalFiles + ")"));

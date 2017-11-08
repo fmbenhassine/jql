@@ -31,6 +31,7 @@ import io.github.benas.jql.domain.TypeDao;
 import io.github.benas.jql.model.Implements;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ImplementsRelationCalculator {
 
@@ -44,17 +45,21 @@ public class ImplementsRelationCalculator {
     }
 
     public void calculate(ClassOrInterfaceDeclaration classOrInterfaceDeclaration, CompilationUnit compilationUnit) {
-        List<ClassOrInterfaceType> implementedInterfaces = classOrInterfaceDeclaration.getImplements();
+        List<ClassOrInterfaceType> implementedInterfaces = classOrInterfaceDeclaration.getImplementedTypes();
         for (ClassOrInterfaceType implementedInterface : implementedInterfaces) {
-            String implementedInterfaceName = implementedInterface.getName();
-            String implementedInterfacePackageName = ((CompilationUnit) implementedInterface.getParentNode().getParentNode()).getPackage().getPackageName();
+            String implementedInterfaceName = implementedInterface.getNameAsString();
+            String implementedInterfacePackageName = implementedInterface
+                    .findCompilationUnit()
+                    .flatMap(CompilationUnit::getPackageDeclaration)
+                    .flatMap(pkg -> Optional.of(pkg.getNameAsString())).orElse("???");
             if (typeDao.exist(implementedInterfaceName, implementedInterfacePackageName)) { // JDK interfaces are not indexed
                 int interfaceId = typeDao.getId(implementedInterfaceName, implementedInterfacePackageName);
-                int nbClasses = typeDao.count(classOrInterfaceDeclaration.getName(), compilationUnit.getPackage().getPackageName());
+                String cuPackageName = compilationUnit.getPackageDeclaration().get().getNameAsString();
+                int nbClasses = typeDao.count(classOrInterfaceDeclaration.getNameAsString(), cuPackageName);
                 if (nbClasses > 1) {
-                    System.err.println("More than one class having the same name '" + classOrInterfaceDeclaration.getName() + "' and package '" + compilationUnit.getPackage().getPackageName() + "'");
+                    System.err.println("More than one class having the same name '" + classOrInterfaceDeclaration.getName() + "' and package '" + cuPackageName + "'");
                 } else {
-                    int classId = typeDao.getId(classOrInterfaceDeclaration.getName(), compilationUnit.getPackage().getPackageName());
+                    int classId = typeDao.getId(classOrInterfaceDeclaration.getNameAsString(), cuPackageName);
                     implementsDao.save(new Implements(classId, interfaceId));
                 }
             }

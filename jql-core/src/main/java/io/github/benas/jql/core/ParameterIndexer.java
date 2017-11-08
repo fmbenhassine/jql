@@ -34,7 +34,7 @@ public class ParameterIndexer {
     }
 
     public void index(com.github.javaparser.ast.body.Parameter parameter, int methodId) {
-        io.github.benas.jql.model.Parameter p = new io.github.benas.jql.model.Parameter(parameter.getId().getName(), parameter.getType().toString(), methodId);
+        io.github.benas.jql.model.Parameter p = new io.github.benas.jql.model.Parameter(parameter.getNameAsString(), parameter.getType().asString(), methodId);
         parameterDao.save(p);
     }
 }

@@ -38,9 +38,8 @@ public class AnnotationMemberIndexer {
     }
 
     public void index(AnnotationMemberDeclaration annotationMemberDeclaration, int typeId) {
-        int annotationMemberModifiers = annotationMemberDeclaration.getModifiers();
-        methodDao.save(new Method(annotationMemberDeclaration.getName(),
-                isPublic(annotationMemberModifiers), isStatic(annotationMemberModifiers), isFinal(annotationMemberModifiers), isAbstract(annotationMemberModifiers), false, typeId));
+        methodDao.save(new Method(annotationMemberDeclaration.getNameAsString(),
+                annotationMemberDeclaration.isPublic(), false, false, annotationMemberDeclaration.isAbstract(), false, typeId));
     }
 
 }

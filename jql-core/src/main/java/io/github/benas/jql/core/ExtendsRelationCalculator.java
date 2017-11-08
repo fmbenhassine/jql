@@ -24,6 +24,7 @@
 package io.github.benas.jql.core;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import io.github.benas.jql.domain.ExtendsDao;
@@ -31,6 +32,7 @@ import io.github.benas.jql.domain.TypeDao;
 import io.github.benas.jql.model.Extends;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ExtendsRelationCalculator {
 
@@ -44,13 +46,17 @@ public class ExtendsRelationCalculator {
     }
 
     public void calculate(ClassOrInterfaceDeclaration classOrInterfaceDeclaration, CompilationUnit compilationUnit) {
-        List<ClassOrInterfaceType> extendedTypes = classOrInterfaceDeclaration.getExtends();
+        List<ClassOrInterfaceType> extendedTypes = classOrInterfaceDeclaration.getExtendedTypes();
         for (ClassOrInterfaceType extendedType : extendedTypes) {
-            String extendedTypeName = extendedType.getName();
-            String extendedTypePackageName = ((CompilationUnit) extendedType.getParentNode().getParentNode()).getPackage().getPackageName();
+            String extendedTypeName = extendedType.getNameAsString();
+            String extendedTypePackageName = extendedType
+                    .findCompilationUnit()
+                    .flatMap(CompilationUnit::getPackageDeclaration)
+                    .flatMap(pkg -> Optional.of(pkg.getNameAsString())).orElse("???");
+
             if (typeDao.exist(extendedTypeName, extendedTypePackageName)) { // JDK interfaces are not indexed
                 int extendedInterfaceId = typeDao.getId(extendedTypeName, extendedTypePackageName);
-                int interfaceId = typeDao.getId(classOrInterfaceDeclaration.getName(), compilationUnit.getPackage().getPackageName());
+                int interfaceId = typeDao.getId(classOrInterfaceDeclaration.getNameAsString(), compilationUnit.getPackageDeclaration().get().getNameAsString());
                 extendsDao.save(new Extends(interfaceId, extendedInterfaceId));
             }
         }
