@@ -31,6 +31,7 @@ import io.github.benas.jql.domain.TypeDao;
 import io.github.benas.jql.model.AnnotatedWith;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AnnotatedWithCalculator {
 
@@ -47,11 +48,15 @@ public class AnnotatedWithCalculator {
     public void calculate(ClassOrInterfaceDeclaration classOrInterfaceDeclaration, CompilationUnit compilationUnit) {
         List<AnnotationExpr> annotations = classOrInterfaceDeclaration.getAnnotations();
         for (AnnotationExpr annotation : annotations) {
-            String annotationName = annotation.getName().getName();
-            String annotationPackageName = ((CompilationUnit) annotation.getParentNode().getParentNode()).getPackage().getPackageName();
+            String annotationName = annotation.getNameAsString();
+            String annotationPackageName = annotation
+                    .findCompilationUnit()
+                    .flatMap(CompilationUnit::getPackageDeclaration)
+                    .flatMap(pkg -> Optional.of(pkg.getNameAsString())).orElse("???");
+
             if (typeDao.exist(annotationName, annotationPackageName)) { // JDK annotations are not indexed
                 int annotationId = typeDao.getId(annotationName, annotationPackageName);
-                int typeId = typeDao.getId(classOrInterfaceDeclaration.getName(), compilationUnit.getPackage().getPackageName());
+                int typeId = typeDao.getId(classOrInterfaceDeclaration.getNameAsString(), compilationUnit.getPackageDeclaration().get().getNameAsString());
                 annotatedWithDao.save(new AnnotatedWith(typeId, annotationId));
             }
         }

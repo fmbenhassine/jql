@@ -43,11 +43,10 @@ public class MethodIndexer {
     }
 
     public void index(MethodDeclaration methodDeclaration, int typeId) {
-        int methodModifiers = methodDeclaration.getModifiers();
         List<Parameter> parameters = methodDeclaration.getParameters();
-        String name = methodDeclaration.getName();
+        String name = methodDeclaration.getNameAsString();
         int methodId = methodDao.save(new Method(name,
-                isPublic(methodModifiers), isStatic(methodModifiers), isFinal(methodModifiers), isAbstract(methodModifiers), false, typeId));
+                methodDeclaration.isPublic(), methodDeclaration.isStatic(), methodDeclaration.isFinal(), methodDeclaration.isAbstract(), false, typeId));
         for (Parameter parameter : parameters) {
             parameterIndexer.index(parameter, methodId);
         }

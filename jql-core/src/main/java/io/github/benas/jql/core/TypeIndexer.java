@@ -23,11 +23,14 @@
  */
 package io.github.benas.jql.core;
 
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.*;
 import io.github.benas.jql.domain.TypeDao;
 import io.github.benas.jql.model.Type;
 
-import static java.lang.reflect.Modifier.*;
+import java.util.EnumSet;
+
+import static com.github.javaparser.ast.Modifier.*;
 
 public class TypeIndexer {
 
@@ -40,14 +43,14 @@ public class TypeIndexer {
         this.bodyDeclarationIndexer = bodyDeclarationIndexer;
     }
 
-    public void index(TypeDeclaration type, int cuId) {
-        int modifiers = type.getModifiers();
+    public void index(TypeDeclaration<?> type, int cuId) {
+        EnumSet<Modifier> modifiers = type.getModifiers();
         boolean isInterface = type instanceof ClassOrInterfaceDeclaration && ((ClassOrInterfaceDeclaration) type).isInterface();
         boolean isAnnotation = type instanceof AnnotationDeclaration;
         boolean isEnumeration = type instanceof EnumDeclaration;
         boolean isClass = !isAnnotation && !isEnumeration && !isInterface;
-
-        Type t = new Type(type.getName(), isPublic(modifiers), isStatic(modifiers), isFinal(modifiers), isAbstract(modifiers), isClass, isInterface, isEnumeration, isAnnotation, cuId);
+        
+        Type t = new Type(type.getNameAsString(), type.isPublic(), type.isStatic(), modifiers.contains(FINAL), modifiers.contains(ABSTRACT), isClass, isInterface, isEnumeration, isAnnotation, cuId);
         int typeId = typeDao.save(t);
 
         for (BodyDeclaration member : type.getMembers()) {

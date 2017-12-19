@@ -24,6 +24,7 @@
 package io.github.benas.jql.core;
 
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import io.github.benas.jql.domain.CompilationUnitDao;
 
 import java.util.List;
@@ -40,11 +41,11 @@ public class CompilationUnitIndexer {
     }
 
     public void index(com.github.javaparser.ast.CompilationUnit compilationUnit, String fileName) {
-        String packageName = compilationUnit.getPackage() != null ? compilationUnit.getPackage().getPackageName() : "";
+        String packageName = compilationUnit.getPackageDeclaration().map(NodeWithName::getNameAsString).orElse("");
         io.github.benas.jql.model.CompilationUnit cu = new io.github.benas.jql.model.CompilationUnit(fileName, packageName);
         int cuId =  compilationUnitDao.save(cu);
-        List<TypeDeclaration> types = compilationUnit.getTypes();
-        for (TypeDeclaration type : types) {
+        List<TypeDeclaration<?>> types = compilationUnit.getTypes();
+        for (TypeDeclaration<?> type : types) {
             typeIndexer.index(type, cuId);
         }
     }

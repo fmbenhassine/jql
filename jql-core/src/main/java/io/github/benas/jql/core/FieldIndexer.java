@@ -30,9 +30,7 @@ import io.github.benas.jql.model.Field;
 
 import java.util.List;
 
-import static java.lang.reflect.Modifier.*;
-
-    public class FieldIndexer {
+public class FieldIndexer {
 
     private FieldDao fieldDao;
 
@@ -41,12 +39,11 @@ import static java.lang.reflect.Modifier.*;
     }
 
     public void index(FieldDeclaration fieldDeclaration, int typeId) {
-        int fieldModifiers = fieldDeclaration.getModifiers();
         List<VariableDeclarator> variables = fieldDeclaration.getVariables();
         for (VariableDeclarator variable : variables) {
-            String name = variable.getId().getName();
-            fieldDao.save(new Field(name, fieldDeclaration.getType().toString(),
-                    isPublic(fieldModifiers), isStatic(fieldModifiers), isFinal(fieldModifiers), isTransient(fieldModifiers), typeId));
+            String name = variable.getNameAsString();
+            fieldDao.save(new Field(name, fieldDeclaration.getElementType().asString(),
+                    fieldDeclaration.isPublic(), fieldDeclaration.isStatic(), fieldDeclaration.isFinal(), fieldDeclaration.isTransient(), typeId));
         }
     }
 

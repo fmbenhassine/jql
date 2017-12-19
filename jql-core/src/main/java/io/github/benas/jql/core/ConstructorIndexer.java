@@ -43,11 +43,10 @@ public class ConstructorIndexer {
     }
 
     public void index(ConstructorDeclaration constructorDeclaration, int typeId) {
-        int modifiers = constructorDeclaration.getModifiers();
         List<Parameter> parameters = constructorDeclaration.getParameters();
-        String name = constructorDeclaration.getName();
+        String name = constructorDeclaration.getNameAsString();
         int methodId = methodDao.save(new Method(name,
-                isPublic(modifiers), isStatic(modifiers), isFinal(modifiers), isAbstract(modifiers), true, typeId));
+                constructorDeclaration.isPublic(), constructorDeclaration.isStatic(), constructorDeclaration.isFinal(), constructorDeclaration.isAbstract(), true, typeId));
         for (Parameter parameter : parameters) {
             parameterIndexer.index(parameter, methodId);
         }
